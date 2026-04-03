@@ -30,6 +30,9 @@ window.onValue = onValue;
 window.remove = remove;
 </script>
 
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body{
     margin:0;
@@ -43,14 +46,11 @@ header{
     background:#111;
     box-shadow:0 0 20px cyan;
 }
-header img{width:80px;}
-
 .container{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
 }
-
 .card{
     background:#1e1e1e;
     margin:15px;
@@ -59,7 +59,6 @@ header img{width:80px;}
     width:300px;
     box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
-
 button{
     background:linear-gradient(45deg,cyan,blue);
     border:none;
@@ -69,17 +68,6 @@ button{
     cursor:pointer;
     color:white;
 }
-button:hover{transform:scale(1.1);}
-
-#leaderboard li{
-    margin:10px;
-    padding:10px;
-    background:#222;
-    border-radius:10px;
-    list-style:none;
-}
-
-/* ADMIN USERS BUTTON STYLE */
 .adminUser{
     background:#111;
     border:1px solid cyan;
@@ -88,25 +76,23 @@ button:hover{transform:scale(1.1);}
     border-radius:12px;
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    box-shadow:0 0 10px cyan;
 }
-
-.adminUser span{
-    font-size:14px;
-}
-
 .deleteBtn{
     background:red;
     border:none;
-    padding:5px 10px;
-    border-radius:8px;
+    padding:5px;
+    border-radius:6px;
     cursor:pointer;
 }
-
 #adminPanel{
     display:none;
     padding:20px;
+}
+.stats{
+    margin:10px;
+    padding:10px;
+    background:#000;
+    border:1px solid cyan;
 }
 </style>
 </head>
@@ -114,18 +100,10 @@ button:hover{transform:scale(1.1);}
 <body>
 
 <header>
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
 <h1>🚀 Scratch Academy</h1>
 </header>
 
 <div class="container">
-
-<div class="card">
-<h2>🎬 Tutorials</h2>
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
-<button onclick="openLink('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
-</div>
 
 <div class="card">
 <h2>🧠 Quiz</h2>
@@ -135,7 +113,7 @@ button:hover{transform:scale(1.1);}
 </div>
 
 <div class="card">
-<h2>🌍 Global Leaderboard</h2>
+<h2>🌍 Leaderboard</h2>
 <input id="gmail" placeholder="Enter Gmail">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
@@ -147,24 +125,24 @@ button:hover{transform:scale(1.1);}
 <button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
 
-<!-- ADMIN -->
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
 <h2>🛠️ Admin Dashboard</h2>
+
+<div class="stats" id="totalUsers">Users: 0</div>
+<div class="stats" id="avgScore">Average Score: 0</div>
+
+<canvas id="chart"></canvas>
+
 <h3>🌍 All Users</h3>
 <div id="adminUsers"></div>
 </div>
 
 <script>
 let progress=0;
+let chart;
 
-function isValidEmail(email){
-    return email.includes("@") && email.includes(".");
-}
-
-function openLink(url){
-    window.open(url,"_blank");
-}
-
+// QUIZ
 function answer(correct){
     if(correct){
         progress+=10;
@@ -174,11 +152,11 @@ function answer(correct){
     }
 }
 
-// SAVE SCORE
+// SAVE
 function saveScore(){
     let email=document.getElementById("gmail").value;
 
-    if(!isValidEmail(email)){
+    if(!email.includes("@")){
         alert("Enter valid Gmail");
         return;
     }
@@ -189,74 +167,89 @@ function saveScore(){
     });
 }
 
-// LOAD LEADERBOARD
+// LOAD DATA
 function loadLeaderboard(){
     onValue(ref(db,"leaderboard"),(snapshot)=>{
         let data=snapshot.val();
         let list=document.getElementById("leaderboard");
+        let container=document.getElementById("adminUsers");
+
         list.innerHTML="";
+        container.innerHTML="";
 
         let arr=[];
+        let total=0;
 
         for(let id in data){
-            arr.push(data[id]);
+            arr.push({id,...data[id]});
+            total+=data[id].score;
         }
 
         arr.sort((a,b)=>b.score-a.score);
 
+        // leaderboard
         arr.forEach((u,i)=>{
-            let medal="";
-            if(i==0)medal="🥇";
-            else if(i==1)medal="🥈";
-            else if(i==2)medal="🥉";
-
             let li=document.createElement("li");
-            li.innerHTML=`${medal} ${u.name} - ${u.score}%`;
+            li.innerHTML=`${u.name} - ${u.score}%`;
             list.appendChild(li);
+        });
+
+        // stats
+        document.getElementById("totalUsers").innerText="Users: "+arr.length;
+        document.getElementById("avgScore").innerText="Average Score: "+Math.round(total/arr.length || 0);
+
+        // chart
+        updateChart(arr);
+
+        // admin users
+        arr.forEach(u=>{
+            let div=document.createElement("div");
+            div.className="adminUser";
+            div.innerHTML=`
+            ${u.name} - ${u.score}%
+            <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
+            `;
+            container.appendChild(div);
         });
     });
 }
 
-// ADMIN USERS AS BUTTON CARDS
-function loadAdminUsers(){
-    onValue(ref(db,"leaderboard"),(snapshot)=>{
-        let data=snapshot.val();
-        let container=document.getElementById("adminUsers");
-        container.innerHTML="";
+// CHART
+function updateChart(data){
+    let labels=data.slice(0,5).map(u=>u.name);
+    let scores=data.slice(0,5).map(u=>u.score);
 
-        for(let id in data){
-            let u=data[id];
+    if(chart) chart.destroy();
 
-            let div=document.createElement("div");
-            div.className="adminUser";
-
-            div.innerHTML=`
-            <span>🧑 ${u.name} - ${u.score}%</span>
-            <button class="deleteBtn" onclick="deleteUser('${id}')">Delete</button>
-            `;
-
-            container.appendChild(div);
+    chart=new Chart(document.getElementById("chart"),{
+        type:"bar",
+        data:{
+            labels:labels,
+            datasets:[{
+                label:"Top Scores",
+                data:scores
+            }]
         }
     });
 }
 
 // DELETE
 function deleteUser(id){
-    if(confirm("Delete user?")){
+    if(confirm("Delete?")){
         remove(ref(db,"leaderboard/"+id));
     }
 }
 
-// ADMIN LOGIN
+// ADMIN
 function openAdmin(){
     let pass=prompt("Password:");
     if(pass==="jamil"){
         document.getElementById("adminPanel").style.display="block";
-        loadAdminUsers();
+        loadLeaderboard();
     }
 }
 
-// LOAD
+// INIT
 window.onload=loadLeaderboard;
 </script>
 
