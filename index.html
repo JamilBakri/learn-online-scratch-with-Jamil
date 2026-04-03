@@ -17,15 +17,22 @@ body {
 header {
     text-align: center;
     padding: 20px;
-    background: #000;
+    background: rgba(0,0,0,0.9);
     border-bottom: 2px solid #00fff7;
 }
 
 header h1 {
-    text-shadow: 0 0 10px #00fff7;
+    text-shadow: 0 0 15px #00fff7;
+    font-size: 28px;
 }
 
-/* CARD STYLE */
+header img {
+    width: 60px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px #00fff7);
+}
+
+/* GLASS CARD */
 .container {
     display: flex;
     justify-content: center;
@@ -34,12 +41,18 @@ header h1 {
 }
 
 .card {
-    background: rgba(0,0,0,0.85);
-    border: 1px solid #00fff7;
-    border-radius: 15px;
-    padding: 20px;
-    margin: 10px;
-    box-shadow: 0 0 20px #00fff7;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,255,247,0.3);
+    border-radius: 20px;
+    padding: 25px;
+    margin: 15px;
+    box-shadow: 0 0 25px rgba(0,255,247,0.4);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
 }
 
 /* PROFILE */
@@ -63,12 +76,12 @@ header h1 {
 }
 
 button {
-    background: black;
+    background: rgba(0,0,0,0.7);
     border: 1px solid #00fff7;
     color: #00fff7;
-    padding: 12px 20px;
+    padding: 12px 22px;
     margin: 10px;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: 0.3s;
     font-size: 16px;
@@ -148,6 +161,7 @@ function logout() {
 <body>
 
 <header>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
 <h1>⚡ Jamil Scratch Tech ⚡</h1>
 <p>Future Coding Starts Here</p>
 </header>
@@ -155,7 +169,7 @@ function logout() {
 <!-- PROFILE -->
 <div class="container">
 <div class="card profile">
-<img src="jamil.jpg" alt="Jamil Profile">
+<img src="jamil.jpg" alt="Jamil">
 <div>
 <h2>👤 Profile</h2>
 <p><b>Name:</b> Jamil Bakri</p>
