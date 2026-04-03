@@ -159,13 +159,18 @@ let currentQuestion=0;
 /* LINKS */
 function go(l){window.open(l,"_blank")}
 
-/* QUIZ (5 QUESTIONS, +20 EACH) */
+/* QUIZ (10 QUESTIONS, +10 EACH) */
 const questions=[
 {q:"What block moves a sprite?",a:["Motion","Sound","Looks"],c:0},
 {q:"Which block plays music?",a:["Control","Sound","Events"],c:1},
 {q:"What starts a project?",a:["When green flag clicked","Move 10 steps","Say Hello"],c:0},
 {q:"Which block repeats actions?",a:["Repeat","Wait","Say"],c:0},
-{q:"What is a sprite?",a:["Character","Sound","Background"],c:0}
+{q:"What is a sprite?",a:["Character","Sound","Background"],c:0},
+{q:"Which block changes color?",a:["Looks","Sound","Control"],c:0},
+{q:"Which block waits?",a:["Wait","Repeat","Move"],c:0},
+{q:"Which block detects touching?",a:["Sensing","Motion","Events"],c:0},
+{q:"Which block sends messages?",a:["Broadcast","Move","Sound"],c:0},
+{q:"Which block controls loops?",a:["Control","Looks","Sound"],c:0}
 ];
 
 function loadQuestion(){
@@ -182,8 +187,8 @@ function loadQuestion(){
     b.innerText=ans
     b.onclick=()=>{
       if(i===q.c){
-        score+=20
-        result.innerText="✅ Correct (+20)"
+        score+=10
+        result.innerText="✅ Correct (+10)"
       }else{
         result.innerText="❌ Wrong"
       }
