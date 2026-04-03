@@ -57,6 +57,7 @@ header{
   padding:20px;
   border-radius:15px;
   width:300px;
+  box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
 button{
   background:linear-gradient(45deg,cyan,blue);
@@ -66,6 +67,10 @@ button{
   border-radius:10px;
   cursor:pointer;
   color:white;
+  width:100%;
+}
+button:hover{
+  transform:scale(1.05);
 }
 #leaderboard li{
   background:#222;
@@ -95,6 +100,13 @@ button{
   margin:10px;
   border:1px solid cyan;
 }
+input{
+  padding:10px;
+  width:100%;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+}
 </style>
 </head>
 
@@ -106,6 +118,7 @@ button{
 
 <div class="container">
 
+<!-- QUIZ -->
 <div class="card">
 <h2>🧠 Quiz</h2>
 <button onclick="answer(true)">Scratch = Programming</button>
@@ -113,11 +126,34 @@ button{
 <p id="result"></p>
 </div>
 
+<!-- LEADERBOARD -->
 <div class="card">
-<h2>🌍 Leaderboard</h2>
+<h2>🌍 Global Leaderboard</h2>
 <input id="gmail" placeholder="Enter Gmail">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
+</div>
+
+<!-- TUTORIALS -->
+<div class="card">
+<h2>🎬 Scratch Tutorials</h2>
+
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">
+💡 All Ideas
+</button>
+
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">
+🚀 Get Started
+</button>
+
+<button onclick="openLink('https://scratch.mit.edu/starter-projects')">
+📚 Starter Projects
+</button>
+
+<button onclick="openLink('https://scratch.mit.edu/explore/projects/games/')">
+🎮 Explore Games
+</button>
+
 </div>
 
 </div>
@@ -126,6 +162,7 @@ button{
 <button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
 
+<!-- ADMIN -->
 <div id="adminPanel">
 <h2>🛠️ Admin Dashboard</h2>
 
@@ -134,27 +171,27 @@ button{
 
 <canvas id="chart"></canvas>
 
-<h3>All Users</h3>
+<h3>🌍 All Users</h3>
 <div id="adminUsers"></div>
 </div>
 
 <script>
-let progress=0;
+let progress = 0;
 let chart;
 
 // QUIZ
 function answer(correct){
   if(correct){
-    progress+=10;
-    document.getElementById("result").innerText="Correct ✅";
-  }else{
-    document.getElementById("result").innerText="Wrong ❌";
+    progress += 10;
+    document.getElementById("result").innerText = "Correct ✅";
+  } else {
+    document.getElementById("result").innerText = "Wrong ❌";
   }
 }
 
-// SAVE
+// SAVE SCORE
 function saveScore(){
-  let email=document.getElementById("gmail").value;
+  let email = document.getElementById("gmail").value;
 
   if(!email.includes("@")){
     alert("Enter valid Gmail");
@@ -162,49 +199,55 @@ function saveScore(){
   }
 
   push(ref(db,"leaderboard"),{
-    name:email,
-    score:progress
+    name: email,
+    score: progress
   });
 }
 
-// LOAD
+// LOAD DATA
 function loadLeaderboard(){
   onValue(ref(db,"leaderboard"),(snapshot)=>{
-    let data=snapshot.val();
+    let data = snapshot.val();
 
-    let list=document.getElementById("leaderboard");
-    let admin=document.getElementById("adminUsers");
+    let list = document.getElementById("leaderboard");
+    let admin = document.getElementById("adminUsers");
 
-    list.innerHTML="";
-    admin.innerHTML="";
+    list.innerHTML = "";
+    admin.innerHTML = "";
 
-    if(!data) return;
+    if(!data){
+      document.getElementById("totalUsers").innerText = "Users: 0";
+      document.getElementById("avgScore").innerText = "Average: 0";
+      return;
+    }
 
-    let arr=[];
-    let total=0;
+    let arr = [];
+    let total = 0;
 
     for(let id in data){
       arr.push({id,...data[id]});
-      total+=data[id].score;
+      total += data[id].score;
     }
 
     arr.sort((a,b)=>b.score-a.score);
 
-    document.getElementById("totalUsers").innerText="Users: "+arr.length;
-    document.getElementById("avgScore").innerText="Average: "+Math.round(total/arr.length);
+    document.getElementById("totalUsers").innerText = "Users: " + arr.length;
+    document.getElementById("avgScore").innerText = "Average: " + Math.round(total / arr.length);
 
     updateChart(arr);
 
-    arr.forEach(u=>{
-      let li=document.createElement("li");
-      li.innerText=`${u.name} - ${u.score}%`;
+    arr.forEach((u,i)=>{
+      let medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
+
+      let li = document.createElement("li");
+      li.innerText = `${medal} ${u.name} - ${u.score}%`;
       list.appendChild(li);
 
-      let div=document.createElement("div");
-      div.className="adminUser";
-      div.innerHTML=`
-      ${u.name} - ${u.score}%
-      <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
+      let div = document.createElement("div");
+      div.className = "adminUser";
+      div.innerHTML = `
+        ${u.name} - ${u.score}%
+        <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
       `;
       admin.appendChild(div);
     });
@@ -213,18 +256,18 @@ function loadLeaderboard(){
 
 // CHART
 function updateChart(data){
-  let labels=data.slice(0,5).map(u=>u.name);
-  let scores=data.slice(0,5).map(u=>u.score);
+  let labels = data.slice(0,5).map(u=>u.name);
+  let scores = data.slice(0,5).map(u=>u.score);
 
   if(chart) chart.destroy();
 
-  chart=new Chart(document.getElementById("chart"),{
+  chart = new Chart(document.getElementById("chart"),{
     type:"bar",
     data:{
-      labels:labels,
+      labels: labels,
       datasets:[{
         label:"Top Scores",
-        data:scores
+        data: scores
       }]
     }
   });
@@ -237,17 +280,23 @@ function deleteUser(id){
   }
 }
 
-// ADMIN
+// ADMIN LOGIN
 function openAdmin(){
-  let pass=prompt("Password:");
-  if(pass==="jamil"){
-    document.getElementById("adminPanel").style.display="block";
-    loadLeaderboard();
+  let pass = prompt("Password:");
+  if(pass === "jamil"){
+    document.getElementById("adminPanel").style.display = "block";
+  } else {
+    alert("Wrong password!");
   }
 }
 
+// OPEN LINKS
+function openLink(url){
+  window.open(url,"_blank");
+}
+
 // INIT
-window.onload=loadLeaderboard;
+window.onload = loadLeaderboard;
 </script>
 
 </body>
