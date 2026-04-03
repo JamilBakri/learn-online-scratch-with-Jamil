@@ -85,6 +85,7 @@ button:hover{
 
 <div class="container">
 
+<!-- PROFILE -->
 <div class="card profile">
 <img src="jamil.jpg">
 <h2>👤 Jamil Bakri</h2>
@@ -93,6 +94,7 @@ button:hover{
 <p>📞 +357 94020504</p>
 </div>
 
+<!-- TUTORIALS -->
 <div class="card">
 <h2>🎬 Tutorials</h2>
 <button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
@@ -100,17 +102,20 @@ button:hover{
 <button onclick="openLink('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
 </div>
 
+<!-- PROGRESS -->
 <div class="card">
 <h2>📊 Progress</h2>
 <progress id="progressBar" value="0" max="100"></progress>
 <p id="progressText">0%</p>
 </div>
 
+<!-- BADGE -->
 <div class="card">
 <h2>🏆 Badge</h2>
 <p id="badge">Beginner 🟢</p>
 </div>
 
+<!-- QUIZ -->
 <div class="card">
 <h2>🧠 Quiz</h2>
 <p>What is Scratch?</p>
@@ -119,14 +124,16 @@ button:hover{
 <p id="result"></p>
 </div>
 
+<!-- LEADERBOARD -->
 <div class="card">
 <h2>🌍 Leaderboard</h2>
-<input id="username" placeholder="Your name">
+<input id="gmail" placeholder="Enter your Gmail">
 <input type="file" id="avatarInput">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
 </div>
 
+<!-- CERTIFICATE -->
 <div class="card">
 <h2>🎓 Certificate</h2>
 <button onclick="generateCertificate()">Get Certificate</button>
@@ -154,6 +161,11 @@ button:hover{
 <script>
 let progress=0;
 let lastTop="";
+
+// EMAIL VALIDATION
+function isValidEmail(email){
+    return email.includes("@") && email.includes(".");
+}
 
 // LINKS
 function openLink(url){
@@ -208,16 +220,21 @@ window.onload=function(){
 
 // LEADERBOARD
 function saveScore(){
-    let name=document.getElementById("username").value||"Player";
-    let file=document.getElementById("avatarInput").files[0];
+    let email=document.getElementById("gmail").value;
 
+    if(!isValidEmail(email)){
+        alert("❌ Enter valid Gmail");
+        return;
+    }
+
+    let file=document.getElementById("avatarInput").files[0];
     let reader=new FileReader();
 
     reader.onload=function(){
         let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
 
         data.push({
-            name:name,
+            name:email,
             score:progress,
             avatar:reader.result||"https://via.placeholder.com/40"
         });
@@ -263,13 +280,19 @@ setInterval(loadLeaderboard,3000);
 
 // CERTIFICATE
 function generateCertificate(){
-    let name=document.getElementById("username").value||"Student";
+    let email=document.getElementById("gmail").value;
+
+    if(!isValidEmail(email)){
+        alert("❌ Enter valid Gmail first");
+        return;
+    }
+
     let certID="SCR-"+Math.floor(Math.random()*1000000);
     let today=new Date().toLocaleDateString();
 
     // SAVE CERT
     let certs=JSON.parse(localStorage.getItem("certificates"))||[];
-    certs.push({name:name,score:progress,date:today,id:certID});
+    certs.push({name:email,score:progress,date:today,id:certID});
     localStorage.setItem("certificates",JSON.stringify(certs));
 
     let win=window.open("");
@@ -290,10 +313,10 @@ function generateCertificate(){
     <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png" width="80">
     <h1>Certificate of Achievement</h1>
     <p>Awarded to</p>
-    <div class="name">${name}</div>
+    <div class="name">${email}</div>
     <p>Score: ${progress}%</p>
     <p>Date: ${today}</p>
-    <p>Instructor: Jamil Bakri</p>
+    <p>Awarded by Jamil Bakri</p>
     <p>ID: ${certID}</p>
     <img src="signature.png" width="120">
     </div>
