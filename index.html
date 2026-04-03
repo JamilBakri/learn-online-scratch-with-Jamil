@@ -34,7 +34,7 @@ header h1 {
 }
 
 .card {
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.85);
     border: 1px solid #00fff7;
     border-radius: 15px;
     padding: 20px;
@@ -86,13 +86,14 @@ button:hover {
     border: 1px solid #00fff7;
 }
 
-/* ADMIN PANEL */
+/* ADMIN */
 #login {
     display: none;
 }
 
 #adminPanel {
     display: none;
+    justify-content: center;
 }
 
 input {
@@ -115,16 +116,24 @@ function showContact() {
 
 function showAdmin() {
     document.getElementById("login").style.display = "block";
+    document.getElementById("adminPanel").style.display = "none";
 }
 
 function checkPassword() {
     let pass = document.getElementById("pass").value;
+
     if(pass === "jamil"){
-        document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("login").style.display = "none";
+        document.getElementById("adminPanel").style.display = "flex";
         alert("Welcome Admin 😎");
     } else {
         alert("Wrong Password ❌");
     }
+}
+
+function logout() {
+    document.getElementById("adminPanel").style.display = "none";
+    document.getElementById("login").style.display = "block";
 }
 </script>
 
@@ -165,17 +174,11 @@ function checkPassword() {
 <!-- BUTTONS -->
 <div class="buttons">
 
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">
-💡 Ideas
-</button>
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
 
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">
-🚀 Get Started
-</button>
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
 
-<button onclick="openLink('https://scratch.mit.edu/starter-projects')">
-📚 Tutorials
-</button>
+<button onclick="openLink('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
 
 <br>
 
@@ -189,7 +192,7 @@ function checkPassword() {
 
 </div>
 
-<!-- ADMIN LOGIN -->
+<!-- LOGIN -->
 <div id="login" class="container">
 <div class="card">
 <h2>🔐 Admin Login</h2>
@@ -210,6 +213,7 @@ function checkPassword() {
 
 <button onclick="alert('User banned 🚫')">Ban User</button>
 <button onclick="alert('Content updated ✅')">Update Content</button>
+<button onclick="logout()">Logout</button>
 
 </div>
 </div>
