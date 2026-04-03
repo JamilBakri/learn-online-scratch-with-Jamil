@@ -59,6 +59,11 @@ header{
   width:300px;
   box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
+.profile img{
+  width:100%;
+  border-radius:15px;
+  margin-bottom:10px;
+}
 button{
   background:linear-gradient(45deg,cyan,blue);
   border:none;
@@ -117,6 +122,16 @@ input{
 </header>
 
 <div class="container">
+
+<!-- PROFILE -->
+<div class="card profile">
+<img src="jamil.jpg">
+<h2>👨‍💻 Profile</h2>
+<p><b>Name:</b> Jamil Bakri</p>
+<p><b>Age:</b> 10</p>
+<p><b>Phone:</b> +357 94 020504</p>
+<p><b>Level:</b> Scratch Instructor</p>
+</div>
 
 <!-- QUIZ -->
 <div class="card">
@@ -179,7 +194,6 @@ input{
 let progress = 0;
 let chart;
 
-// QUIZ
 function answer(correct){
   if(correct){
     progress += 10;
@@ -189,37 +203,28 @@ function answer(correct){
   }
 }
 
-// SAVE SCORE
 function saveScore(){
   let email = document.getElementById("gmail").value;
-
   if(!email.includes("@")){
     alert("Enter valid Gmail");
     return;
   }
-
   push(ref(db,"leaderboard"),{
     name: email,
     score: progress
   });
 }
 
-// LOAD DATA
 function loadLeaderboard(){
   onValue(ref(db,"leaderboard"),(snapshot)=>{
     let data = snapshot.val();
-
     let list = document.getElementById("leaderboard");
     let admin = document.getElementById("adminUsers");
 
     list.innerHTML = "";
     admin.innerHTML = "";
 
-    if(!data){
-      document.getElementById("totalUsers").innerText = "Users: 0";
-      document.getElementById("avgScore").innerText = "Average: 0";
-      return;
-    }
+    if(!data) return;
 
     let arr = [];
     let total = 0;
@@ -254,7 +259,6 @@ function loadLeaderboard(){
   });
 }
 
-// CHART
 function updateChart(data){
   let labels = data.slice(0,5).map(u=>u.name);
   let scores = data.slice(0,5).map(u=>u.score);
@@ -273,14 +277,12 @@ function updateChart(data){
   });
 }
 
-// DELETE
 function deleteUser(id){
   if(confirm("Delete user?")){
     remove(ref(db,"leaderboard/"+id));
   }
 }
 
-// ADMIN LOGIN
 function openAdmin(){
   let pass = prompt("Password:");
   if(pass === "jamil"){
@@ -290,12 +292,10 @@ function openAdmin(){
   }
 }
 
-// OPEN LINKS
 function openLink(url){
   window.open(url,"_blank");
 }
 
-// INIT
 window.onload = loadLeaderboard;
 </script>
 
