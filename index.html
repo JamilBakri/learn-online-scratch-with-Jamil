@@ -12,8 +12,6 @@ body{
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
 }
-
-/* HEADER */
 header{
   text-align:center;
   padding:20px;
@@ -21,7 +19,6 @@ header{
 }
 header img{width:60px}
 
-/* CARDS */
 .container{
   display:flex;
   flex-wrap:wrap;
@@ -37,13 +34,11 @@ header img{width:60px}
   box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
-/* PROFILE */
 .profile img{
   width:100%;
   border-radius:10px;
 }
 
-/* BUTTONS */
 button{
   width:100%;
   padding:10px;
@@ -55,7 +50,6 @@ button{
 }
 button:hover{transform:scale(1.05)}
 
-/* PROGRESS */
 .bar{
   background:#333;
   border-radius:10px;
@@ -67,7 +61,6 @@ button:hover{transform:scale(1.05)}
   border-radius:10px;
 }
 
-/* ADMIN */
 #adminPanel{
   display:none;
   background:black;
@@ -113,9 +106,8 @@ button:hover{transform:scale(1.05)}
 <!-- QUIZ -->
 <div class="card">
 <h2>🧠 Quiz</h2>
-<p>What block moves a sprite?</p>
-<button onclick="answer(true)">Motion</button>
-<button onclick="answer(false)">Sound</button>
+<p id="question">Loading...</p>
+<div id="answers"></div>
 <p id="result"></p>
 
 <div class="bar"><div id="bar" class="bar-inner"></div></div>
@@ -125,8 +117,8 @@ button:hover{transform:scale(1.05)}
 <!-- REWARD -->
 <div class="card">
 <h2>🎁 Daily Reward</h2>
-<p id="reward">Claim your reward!</p>
-<button onclick="reward()">🎁 Claim</button>
+<p id="rewardText">Claim your reward!</p>
+<button onclick="claimReward()">🎁 Claim</button>
 </div>
 
 <!-- BADGES -->
@@ -144,7 +136,7 @@ button:hover{transform:scale(1.05)}
 <div id="board"></div>
 </div>
 
-<!-- ADMIN BUTTON -->
+<!-- ADMIN -->
 <div class="card">
 <h2>🛠 Admin</h2>
 <button onclick="admin()">Open Panel</button>
@@ -162,15 +154,41 @@ button:hover{transform:scale(1.05)}
 
 <script>
 let score=0;
+let currentQuestion=0;
 
 /* LINKS */
 function go(l){window.open(l,"_blank")}
 
-/* QUIZ */
-function answer(c){
-  if(c){score+=10;result.innerText="Correct!"}
-  else result.innerText="Wrong!"
-  update()
+/* QUIZ QUESTIONS */
+const questions=[
+{q:"What block moves a sprite?",a:["Motion","Sound","Looks"],c:0},
+{q:"Which block plays music?",a:["Control","Sound","Events"],c:1},
+{q:"What starts a project?",a:["Green flag","Move","Say"],c:0},
+{q:"Which repeats?",a:["Repeat","Wait","Say"],c:0},
+{q:"What is sprite?",a:["Character","Sound","Code"],c:0}
+];
+
+function loadQuestion(){
+  if(currentQuestion>=questions.length){
+    question.innerText="🎉 Quiz Finished!"
+    answers.innerHTML=""
+    return
+  }
+  let q=questions[currentQuestion]
+  question.innerText=q.q
+  answers.innerHTML=""
+  q.a.forEach((ans,i)=>{
+    let b=document.createElement("button")
+    b.innerText=ans
+    b.onclick=()=>{
+      if(i===q.c){score+=10;result.innerText="✅ Correct!"}
+      else result.innerText="❌ Wrong!"
+      currentQuestion++
+      update()
+      loadQuestion()
+    }
+    answers.appendChild(b)
+  })
 }
 
 /* PROGRESS */
@@ -178,11 +196,11 @@ function update(){
   if(score>100)score=100
   bar.style.width=score+"%"
   progress.innerText="Progress: "+score+"%"
-  badgesUpdate()
+  updateBadges()
 }
 
 /* BADGES */
-function badgesUpdate(){
+function updateBadges(){
   badges.innerHTML=""
   if(score>=20)badges.innerHTML+="🥉 Beginner<br>"
   if(score>=50)badges.innerHTML+="🥈 Pro<br>"
@@ -210,13 +228,16 @@ function loadMissions(){
 }
 
 /* REWARD */
-function reward(){
+function claimReward(){
   let t=new Date().toDateString()
-  if(localStorage.r==t){reward.innerText="Already claimed";return}
-  localStorage.r=t
+  if(localStorage.reward===t){
+    rewardText.innerText="Already claimed!"
+    return
+  }
+  localStorage.reward=t
   score+=20
   update()
-  reward.innerText="+20 points!"
+  rewardText.innerText="+20 points!"
   sound.play()
 }
 
@@ -248,12 +269,12 @@ function certificate(){
   let d=new Date().toLocaleDateString()
   let id="CERT-"+Math.floor(Math.random()*100000)
   w.document.write(`
-  <h1 style="text-align:center">Certificate</h1>
+  <h1 style="text-align:center">Certificate of Achievement</h1>
   <p style="text-align:center">${g}</p>
   <p style="text-align:center">Awarded by Jamil Bakri</p>
   <p style="text-align:center">${d}</p>
   <p style="text-align:center">${id}</p>
-  <button onclick="window.print()">Download</button>
+  <button onclick="window.print()">Download PDF</button>
   `)
 }
 
@@ -283,6 +304,7 @@ function del(i){
 window.onload=()=>{
   loadBoard()
   loadMissions()
+  loadQuestion()
 }
 </script>
 
