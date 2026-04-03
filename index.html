@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scratch Academy</title>
 
-<!-- FIREBASE (MODULE) -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -23,7 +23,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// make global
 window.db = db;
 window.ref = ref;
 window.push = push;
@@ -45,11 +44,13 @@ header{
     box-shadow:0 0 20px cyan;
 }
 header img{width:80px;}
+
 .container{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
 }
+
 .card{
     background:#1e1e1e;
     margin:15px;
@@ -58,10 +59,7 @@ header img{width:80px;}
     width:300px;
     box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
-.profile img{
-    width:100%;
-    border-radius:15px;
-}
+
 button{
     background:linear-gradient(45deg,cyan,blue);
     border:none;
@@ -72,6 +70,7 @@ button{
     color:white;
 }
 button:hover{transform:scale(1.1);}
+
 #leaderboard li{
     margin:10px;
     padding:10px;
@@ -79,12 +78,35 @@ button:hover{transform:scale(1.1);}
     border-radius:10px;
     list-style:none;
 }
+
+/* ADMIN USERS BUTTON STYLE */
+.adminUser{
+    background:#111;
+    border:1px solid cyan;
+    padding:10px;
+    margin:10px;
+    border-radius:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 0 10px cyan;
+}
+
+.adminUser span{
+    font-size:14px;
+}
+
+.deleteBtn{
+    background:red;
+    border:none;
+    padding:5px 10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
 #adminPanel{
     display:none;
-    background:#000;
     padding:20px;
-    margin:20px;
-    border:2px solid red;
 }
 </style>
 </head>
@@ -98,16 +120,6 @@ button:hover{transform:scale(1.1);}
 
 <div class="container">
 
-<!-- PROFILE -->
-<div class="card profile">
-<img src="jamil.jpg">
-<h2>👤 Jamil Bakri</h2>
-<p>Age: 10</p>
-<p>Instructor of Scratch</p>
-<p>📞 +357 94020504</p>
-</div>
-
-<!-- TUTORIALS -->
 <div class="card">
 <h2>🎬 Tutorials</h2>
 <button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
@@ -115,40 +127,18 @@ button:hover{transform:scale(1.1);}
 <button onclick="openLink('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
 </div>
 
-<!-- PROGRESS -->
-<div class="card">
-<h2>📊 Progress</h2>
-<progress id="progressBar" value="0" max="100"></progress>
-<p id="progressText">0%</p>
-</div>
-
-<!-- BADGE -->
-<div class="card">
-<h2>🏆 Badge</h2>
-<p id="badge">Beginner 🟢</p>
-</div>
-
-<!-- QUIZ -->
 <div class="card">
 <h2>🧠 Quiz</h2>
-<p>What is Scratch?</p>
-<button onclick="answer(true)">Programming Language</button>
-<button onclick="answer(false)">Game</button>
+<button onclick="answer(true)">Scratch = Programming</button>
+<button onclick="answer(false)">Scratch = Game</button>
 <p id="result"></p>
 </div>
 
-<!-- GLOBAL LEADERBOARD -->
 <div class="card">
 <h2>🌍 Global Leaderboard</h2>
-<input id="gmail" placeholder="Enter your Gmail">
+<input id="gmail" placeholder="Enter Gmail">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
-</div>
-
-<!-- CERTIFICATE -->
-<div class="card">
-<h2>🎓 Certificate</h2>
-<button onclick="generateCertificate()">Get Certificate</button>
 </div>
 
 </div>
@@ -157,69 +147,34 @@ button:hover{transform:scale(1.1);}
 <button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ADMIN -->
 <div id="adminPanel">
 <h2>🛠️ Admin Dashboard</h2>
 <h3>🌍 All Users</h3>
-<ul id="adminUsers"></ul>
+<div id="adminUsers"></div>
 </div>
 
 <script>
 let progress=0;
 
-// EMAIL
 function isValidEmail(email){
     return email.includes("@") && email.includes(".");
 }
 
-// LINKS
 function openLink(url){
     window.open(url,"_blank");
 }
 
-// QUIZ
 function answer(correct){
     if(correct){
+        progress+=10;
         document.getElementById("result").innerText="Correct ✅";
-        addProgress(10);
     }else{
         document.getElementById("result").innerText="Wrong ❌";
     }
 }
 
-// PROGRESS
-function addProgress(val){
-    progress+=val;
-    if(progress>100)progress=100;
-
-    document.getElementById("progressBar").value=progress;
-    document.getElementById("progressText").innerText=progress+"%";
-
-    localStorage.setItem("progress",progress);
-    updateBadge();
-}
-
-function updateBadge(){
-    let b=document.getElementById("badge");
-    if(progress>=100)b.innerText="Master 🔥";
-    else if(progress>=60)b.innerText="Pro ⚡";
-    else if(progress>=30)b.innerText="Intermediate 💡";
-    else b.innerText="Beginner 🟢";
-}
-
-// LOAD
-window.onload=function(){
-    let saved=localStorage.getItem("progress");
-    if(saved){
-        progress=parseInt(saved);
-        document.getElementById("progressBar").value=progress;
-        document.getElementById("progressText").innerText=progress+"%";
-        updateBadge();
-    }
-    loadLeaderboard();
-};
-
-// SAVE SCORE (GLOBAL)
+// SAVE SCORE
 function saveScore(){
     let email=document.getElementById("gmail").value;
 
@@ -244,7 +199,7 @@ function loadLeaderboard(){
         let arr=[];
 
         for(let id in data){
-            arr.push({id,...data[id]});
+            arr.push(data[id]);
         }
 
         arr.sort((a,b)=>b.score-a.score);
@@ -262,27 +217,30 @@ function loadLeaderboard(){
     });
 }
 
-// ADMIN LOAD USERS
+// ADMIN USERS AS BUTTON CARDS
 function loadAdminUsers(){
     onValue(ref(db,"leaderboard"),(snapshot)=>{
         let data=snapshot.val();
-        let list=document.getElementById("adminUsers");
-        list.innerHTML="";
+        let container=document.getElementById("adminUsers");
+        container.innerHTML="";
 
         for(let id in data){
             let u=data[id];
 
-            let li=document.createElement("li");
-            li.innerHTML=`
-            🧑 ${u.name} - ${u.score}%
-            <button onclick="deleteUser('${id}')">❌ Delete</button>
+            let div=document.createElement("div");
+            div.className="adminUser";
+
+            div.innerHTML=`
+            <span>🧑 ${u.name} - ${u.score}%</span>
+            <button class="deleteBtn" onclick="deleteUser('${id}')">Delete</button>
             `;
-            list.appendChild(li);
+
+            container.appendChild(div);
         }
     });
 }
 
-// DELETE USER
+// DELETE
 function deleteUser(id){
     if(confirm("Delete user?")){
         remove(ref(db,"leaderboard/"+id));
@@ -291,43 +249,15 @@ function deleteUser(id){
 
 // ADMIN LOGIN
 function openAdmin(){
-    let pass=prompt("Enter Admin Password:");
+    let pass=prompt("Password:");
     if(pass==="jamil"){
         document.getElementById("adminPanel").style.display="block";
         loadAdminUsers();
-    }else{
-        alert("Wrong password");
     }
 }
 
-// CERTIFICATE
-function generateCertificate(){
-    let email=document.getElementById("gmail").value;
-
-    if(!isValidEmail(email)){
-        alert("Enter Gmail first");
-        return;
-    }
-
-    let id="SCR-"+Math.floor(Math.random()*1000000);
-    let date=new Date().toLocaleDateString();
-
-    let win=window.open("");
-
-    win.document.write(`
-    <html>
-    <body style="text-align:center;font-family:Georgia;">
-    <h1>Certificate of Achievement</h1>
-    <h2>${email}</h2>
-    <p>Score: ${progress}%</p>
-    <p>Date: ${date}</p>
-    <p>ID: ${id}</p>
-    <p>Awarded by Jamil Bakri</p>
-    <button onclick="window.print()">Download PDF</button>
-    </body>
-    </html>
-    `);
-}
+// LOAD
+window.onload=loadLeaderboard;
 </script>
 
 </body>
