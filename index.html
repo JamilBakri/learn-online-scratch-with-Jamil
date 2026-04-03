@@ -5,6 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scratch Academy</title>
 
+<!-- FIREBASE (MODULE) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "PASTE_KEY",
+  authDomain: "PASTE_DOMAIN",
+  databaseURL: "PASTE_DB_URL",
+  projectId: "PASTE",
+  storageBucket: "PASTE",
+  messagingSenderId: "PASTE",
+  appId: "PASTE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// make global
+window.db = db;
+window.ref = ref;
+window.push = push;
+window.onValue = onValue;
+window.remove = remove;
+</script>
+
 <style>
 body{
     margin:0;
@@ -12,24 +38,18 @@ body{
     background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
     color:white;
 }
-
 header{
     text-align:center;
     padding:20px;
     background:#111;
     box-shadow:0 0 20px cyan;
 }
-
-header img{
-    width:80px;
-}
-
+header img{width:80px;}
 .container{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
 }
-
 .card{
     background:#1e1e1e;
     margin:15px;
@@ -38,12 +58,10 @@ header img{
     width:300px;
     box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
-
 .profile img{
     width:100%;
     border-radius:15px;
 }
-
 button{
     background:linear-gradient(45deg,cyan,blue);
     border:none;
@@ -53,11 +71,7 @@ button{
     cursor:pointer;
     color:white;
 }
-
-button:hover{
-    transform:scale(1.1);
-}
-
+button:hover{transform:scale(1.1);}
 #leaderboard li{
     margin:10px;
     padding:10px;
@@ -65,7 +79,6 @@ button:hover{
     border-radius:10px;
     list-style:none;
 }
-
 #adminPanel{
     display:none;
     background:#000;
@@ -124,11 +137,10 @@ button:hover{
 <p id="result"></p>
 </div>
 
-<!-- LEADERBOARD -->
+<!-- GLOBAL LEADERBOARD -->
 <div class="card">
-<h2>🌍 Leaderboard</h2>
+<h2>🌍 Global Leaderboard</h2>
 <input id="gmail" placeholder="Enter your Gmail">
-<input type="file" id="avatarInput">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
 </div>
@@ -145,24 +157,17 @@ button:hover{
 <button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
-<h2>Admin Panel</h2>
-<button onclick="resetProgress()">Reset Progress</button>
-<button onclick="clearLeaderboard()">Clear Leaderboard</button>
-
-<h3>🎓 Certificates</h3>
-<ul id="certList"></ul>
+<h2>🛠️ Admin Dashboard</h2>
+<h3>🌍 All Users</h3>
+<ul id="adminUsers"></ul>
 </div>
-
-<audio id="sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
 let progress=0;
-let lastTop="";
 
-// EMAIL VALIDATION
+// EMAIL
 function isValidEmail(email){
     return email.includes("@") && email.includes(".");
 }
@@ -174,13 +179,11 @@ function openLink(url){
 
 // QUIZ
 function answer(correct){
-    let res=document.getElementById("result");
-
     if(correct){
-        res.innerText="Correct ✅";
+        document.getElementById("result").innerText="Correct ✅";
         addProgress(10);
     }else{
-        res.innerText="Wrong ❌";
+        document.getElementById("result").innerText="Wrong ❌";
     }
 }
 
@@ -192,14 +195,12 @@ function addProgress(val){
     document.getElementById("progressBar").value=progress;
     document.getElementById("progressText").innerText=progress+"%";
 
-    updateBadge();
     localStorage.setItem("progress",progress);
+    updateBadge();
 }
 
-// BADGE
 function updateBadge(){
     let b=document.getElementById("badge");
-
     if(progress>=100)b.innerText="Master 🔥";
     else if(progress>=60)b.innerText="Pro ⚡";
     else if(progress>=30)b.innerText="Intermediate 💡";
@@ -218,145 +219,114 @@ window.onload=function(){
     loadLeaderboard();
 };
 
-// LEADERBOARD
+// SAVE SCORE (GLOBAL)
 function saveScore(){
     let email=document.getElementById("gmail").value;
 
     if(!isValidEmail(email)){
-        alert("❌ Enter valid Gmail");
+        alert("Enter valid Gmail");
         return;
     }
 
-    let file=document.getElementById("avatarInput").files[0];
-    let reader=new FileReader();
-
-    reader.onload=function(){
-        let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
-
-        data.push({
-            name:email,
-            score:progress,
-            avatar:reader.result||"https://via.placeholder.com/40"
-        });
-
-        localStorage.setItem("leaderboard",JSON.stringify(data));
-        loadLeaderboard();
-    };
-
-    if(file)reader.readAsDataURL(file);
-    else reader.onload();
+    push(ref(db,"leaderboard"),{
+        name:email,
+        score:progress
+    });
 }
 
+// LOAD LEADERBOARD
 function loadLeaderboard(){
-    let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
+    onValue(ref(db,"leaderboard"),(snapshot)=>{
+        let data=snapshot.val();
+        let list=document.getElementById("leaderboard");
+        list.innerHTML="";
 
-    data.sort((a,b)=>b.score-a.score);
+        let arr=[];
 
-    let list=document.getElementById("leaderboard");
-    list.innerHTML="";
+        for(let id in data){
+            arr.push({id,...data[id]});
+        }
 
-    data.forEach((u,i)=>{
-        let medal="";
-        if(i==0)medal="🥇";
-        else if(i==1)medal="🥈";
-        else if(i==2)medal="🥉";
+        arr.sort((a,b)=>b.score-a.score);
 
-        let li=document.createElement("li");
+        arr.forEach((u,i)=>{
+            let medal="";
+            if(i==0)medal="🥇";
+            else if(i==1)medal="🥈";
+            else if(i==2)medal="🥉";
 
-        li.innerHTML=`${medal}
-        <img src="${u.avatar}" width="40" style="border-radius:50%;">
-        ${u.name} - ${u.score}%`;
-
-        list.appendChild(li);
+            let li=document.createElement("li");
+            li.innerHTML=`${medal} ${u.name} - ${u.score}%`;
+            list.appendChild(li);
+        });
     });
+}
 
-    if(data[0] && data[0].name!==lastTop){
-        document.getElementById("sound").play();
-        lastTop=data[0].name;
+// ADMIN LOAD USERS
+function loadAdminUsers(){
+    onValue(ref(db,"leaderboard"),(snapshot)=>{
+        let data=snapshot.val();
+        let list=document.getElementById("adminUsers");
+        list.innerHTML="";
+
+        for(let id in data){
+            let u=data[id];
+
+            let li=document.createElement("li");
+            li.innerHTML=`
+            🧑 ${u.name} - ${u.score}%
+            <button onclick="deleteUser('${id}')">❌ Delete</button>
+            `;
+            list.appendChild(li);
+        }
+    });
+}
+
+// DELETE USER
+function deleteUser(id){
+    if(confirm("Delete user?")){
+        remove(ref(db,"leaderboard/"+id));
     }
 }
 
-setInterval(loadLeaderboard,3000);
+// ADMIN LOGIN
+function openAdmin(){
+    let pass=prompt("Enter Admin Password:");
+    if(pass==="jamil"){
+        document.getElementById("adminPanel").style.display="block";
+        loadAdminUsers();
+    }else{
+        alert("Wrong password");
+    }
+}
 
 // CERTIFICATE
 function generateCertificate(){
     let email=document.getElementById("gmail").value;
 
     if(!isValidEmail(email)){
-        alert("❌ Enter valid Gmail first");
+        alert("Enter Gmail first");
         return;
     }
 
-    let certID="SCR-"+Math.floor(Math.random()*1000000);
-    let today=new Date().toLocaleDateString();
-
-    // SAVE CERT
-    let certs=JSON.parse(localStorage.getItem("certificates"))||[];
-    certs.push({name:email,score:progress,date:today,id:certID});
-    localStorage.setItem("certificates",JSON.stringify(certs));
+    let id="SCR-"+Math.floor(Math.random()*1000000);
+    let date=new Date().toLocaleDateString();
 
     let win=window.open("");
 
     win.document.write(`
     <html>
-    <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
-    <style>
-    body{font-family:Georgia;text-align:center;background:#eee;}
-    .cert{background:white;margin:20px;padding:40px;border:10px solid gold;}
-    .name{font-size:35px;font-weight:bold;}
-    </style>
-    </head>
-    <body>
-
-    <div id="cert" class="cert">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png" width="80">
+    <body style="text-align:center;font-family:Georgia;">
     <h1>Certificate of Achievement</h1>
-    <p>Awarded to</p>
-    <div class="name">${email}</div>
+    <h2>${email}</h2>
     <p>Score: ${progress}%</p>
-    <p>Date: ${today}</p>
+    <p>Date: ${date}</p>
+    <p>ID: ${id}</p>
     <p>Awarded by Jamil Bakri</p>
-    <p>ID: ${certID}</p>
-    <img src="signature.png" width="120">
-    </div>
-
-    <button onclick="html2pdf().from(document.getElementById('cert')).save()">Download PDF</button>
-
+    <button onclick="window.print()">Download PDF</button>
     </body>
     </html>
     `);
-}
-
-// ADMIN
-function openAdmin(){
-    let pass=prompt("Password:");
-    if(pass==="jamil"){
-        document.getElementById("adminPanel").style.display="block";
-        loadCertificates();
-    }
-}
-
-function loadCertificates(){
-    let certs=JSON.parse(localStorage.getItem("certificates"))||[];
-    let list=document.getElementById("certList");
-    list.innerHTML="";
-
-    certs.forEach(c=>{
-        let li=document.createElement("li");
-        li.innerHTML=`${c.name} | ${c.score}% <br> ${c.id} | ${c.date}`;
-        list.appendChild(li);
-    });
-}
-
-function resetProgress(){
-    localStorage.removeItem("progress");
-    location.reload();
-}
-
-function clearLeaderboard(){
-    localStorage.removeItem("leaderboard");
-    loadLeaderboard();
 }
 </script>
 
