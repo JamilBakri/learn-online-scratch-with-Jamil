@@ -159,13 +159,13 @@ let currentQuestion=0;
 /* LINKS */
 function go(l){window.open(l,"_blank")}
 
-/* QUIZ QUESTIONS */
+/* QUIZ (5 QUESTIONS, +20 EACH) */
 const questions=[
 {q:"What block moves a sprite?",a:["Motion","Sound","Looks"],c:0},
 {q:"Which block plays music?",a:["Control","Sound","Events"],c:1},
-{q:"What starts a project?",a:["Green flag","Move","Say"],c:0},
-{q:"Which repeats?",a:["Repeat","Wait","Say"],c:0},
-{q:"What is sprite?",a:["Character","Sound","Code"],c:0}
+{q:"What starts a project?",a:["When green flag clicked","Move 10 steps","Say Hello"],c:0},
+{q:"Which block repeats actions?",a:["Repeat","Wait","Say"],c:0},
+{q:"What is a sprite?",a:["Character","Sound","Background"],c:0}
 ];
 
 function loadQuestion(){
@@ -181,8 +181,12 @@ function loadQuestion(){
     let b=document.createElement("button")
     b.innerText=ans
     b.onclick=()=>{
-      if(i===q.c){score+=10;result.innerText="✅ Correct!"}
-      else result.innerText="❌ Wrong!"
+      if(i===q.c){
+        score+=20
+        result.innerText="✅ Correct (+20)"
+      }else{
+        result.innerText="❌ Wrong"
+      }
       currentQuestion++
       update()
       loadQuestion()
@@ -203,7 +207,7 @@ function update(){
 function updateBadges(){
   badges.innerHTML=""
   if(score>=20)badges.innerHTML+="🥉 Beginner<br>"
-  if(score>=50)badges.innerHTML+="🥈 Pro<br>"
+  if(score>=60)badges.innerHTML+="🥈 Pro<br>"
   if(score>=100)badges.innerHTML+="🥇 Master<br>"
 }
 
