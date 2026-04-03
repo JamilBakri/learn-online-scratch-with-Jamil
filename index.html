@@ -13,23 +13,21 @@ body{
   color:white;
 }
 
+/* HEADER */
 header{
   text-align:center;
   padding:20px;
   background:#ff7b00;
 }
+header img{width:60px}
 
-header img{
-  width:60px;
-}
-
+/* CARDS */
 .container{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
   padding:20px;
 }
-
 .card{
   background:#1e1e1e;
   margin:10px;
@@ -39,6 +37,254 @@ header img{
   box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
+/* PROFILE */
+.profile img{
+  width:100%;
+  border-radius:10px;
+}
+
+/* BUTTONS */
 button{
   width:100%;
-  padding
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#ff7b00,#ffae00);
+  cursor:pointer;
+}
+button:hover{transform:scale(1.05)}
+
+/* PROGRESS */
+.bar{
+  background:#333;
+  border-radius:10px;
+}
+.bar-inner{
+  height:20px;
+  width:0%;
+  background:lime;
+  border-radius:10px;
+}
+
+/* ADMIN */
+#adminPanel{
+  display:none;
+  background:black;
+  padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
+<h1>Scratch Academy</h1>
+</header>
+
+<div class="container">
+
+<!-- PROFILE -->
+<div class="card profile">
+<img src="jamil.jpg">
+<h2>👨‍🏫 Jamil Bakri</h2>
+<p>Age: 10</p>
+<p>Instructor of Scratch</p>
+<p>📞 357+94020504</p>
+<p>Level: Master</p>
+</div>
+
+<!-- TUTORIALS -->
+<div class="card">
+<h2>🎬 Tutorials</h2>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
+<button onclick="go('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
+<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">🎮 Games</button>
+</div>
+
+<!-- MISSIONS -->
+<div class="card">
+<h2>📅 Daily Missions</h2>
+<div id="missions"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="card">
+<h2>🧠 Quiz</h2>
+<p>What block moves a sprite?</p>
+<button onclick="answer(true)">Motion</button>
+<button onclick="answer(false)">Sound</button>
+<p id="result"></p>
+
+<div class="bar"><div id="bar" class="bar-inner"></div></div>
+<p id="progress">Progress: 0%</p>
+</div>
+
+<!-- REWARD -->
+<div class="card">
+<h2>🎁 Daily Reward</h2>
+<p id="reward">Claim your reward!</p>
+<button onclick="reward()">🎁 Claim</button>
+</div>
+
+<!-- BADGES -->
+<div class="card">
+<h2>🏆 Badges</h2>
+<div id="badges"></div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="card">
+<h2>🌍 Leaderboard</h2>
+<input id="gmail" placeholder="Enter Gmail"><br>
+<button onclick="save()">Save Score</button>
+<button onclick="certificate()">🎓 Certificate</button>
+<div id="board"></div>
+</div>
+
+<!-- ADMIN BUTTON -->
+<div class="card">
+<h2>🛠 Admin</h2>
+<button onclick="admin()">Open Panel</button>
+</div>
+
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+<h2>ADMIN DASHBOARD</h2>
+<div id="adminUsers"></div>
+</div>
+
+<audio id="sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+
+<script>
+let score=0;
+
+/* LINKS */
+function go(l){window.open(l,"_blank")}
+
+/* QUIZ */
+function answer(c){
+  if(c){score+=10;result.innerText="Correct!"}
+  else result.innerText="Wrong!"
+  update()
+}
+
+/* PROGRESS */
+function update(){
+  if(score>100)score=100
+  bar.style.width=score+"%"
+  progress.innerText="Progress: "+score+"%"
+  badgesUpdate()
+}
+
+/* BADGES */
+function badgesUpdate(){
+  badges.innerHTML=""
+  if(score>=20)badges.innerHTML+="🥉 Beginner<br>"
+  if(score>=50)badges.innerHTML+="🥈 Pro<br>"
+  if(score>=100)badges.innerHTML+="🥇 Master<br>"
+}
+
+/* MISSIONS */
+const missionsList=[
+["Move Sprite","https://scratch.mit.edu/projects/editor/?tutorial=getStarted"],
+["Animation","https://scratch.mit.edu/projects/editor/?tutorial=all"],
+["Starter","https://scratch.mit.edu/starter-projects"],
+["Games","https://scratch.mit.edu/explore/projects/games/"]
+];
+
+function loadMissions(){
+  let d=new Date().getDate()
+  missions.innerHTML=""
+  for(let i=0;i<3;i++){
+    let m=missionsList[(d+i)%missionsList.length]
+    let b=document.createElement("button")
+    b.innerText="🎯 "+m[0]
+    b.onclick=()=>{go(m[1]);score+=10;update()}
+    missions.appendChild(b)
+  }
+}
+
+/* REWARD */
+function reward(){
+  let t=new Date().toDateString()
+  if(localStorage.r==t){reward.innerText="Already claimed";return}
+  localStorage.r=t
+  score+=20
+  update()
+  reward.innerText="+20 points!"
+  sound.play()
+}
+
+/* LEADERBOARD */
+function save(){
+  let g=gmail.value
+  if(!g)return alert("Enter Gmail")
+  let data=JSON.parse(localStorage.lb||"[]")
+  data.push({g,score})
+  localStorage.lb=JSON.stringify(data)
+  loadBoard()
+}
+
+function loadBoard(){
+  let data=JSON.parse(localStorage.lb||"[]")
+  data.sort((a,b)=>b.score-a.score)
+  board.innerHTML=""
+  data.forEach((u,i)=>{
+    let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":""
+    board.innerHTML+=medal+" "+u.g+" - "+u.score+"<br>"
+  })
+}
+
+/* CERTIFICATE */
+function certificate(){
+  let g=gmail.value
+  if(!g)return alert("Enter Gmail")
+  let w=window.open()
+  let d=new Date().toLocaleDateString()
+  let id="CERT-"+Math.floor(Math.random()*100000)
+  w.document.write(`
+  <h1 style="text-align:center">Certificate</h1>
+  <p style="text-align:center">${g}</p>
+  <p style="text-align:center">Awarded by Jamil Bakri</p>
+  <p style="text-align:center">${d}</p>
+  <p style="text-align:center">${id}</p>
+  <button onclick="window.print()">Download</button>
+  `)
+}
+
+/* ADMIN */
+function admin(){
+  let p=prompt("Password?")
+  if(p==="jamil"){
+    adminPanel.style.display="block"
+    let data=JSON.parse(localStorage.lb||"[]")
+    adminUsers.innerHTML=""
+    data.forEach((u,i)=>{
+      adminUsers.innerHTML+=u.g+" - "+u.score+
+      ` <button onclick="del(${i})">Delete</button><br>`
+    })
+  }
+}
+
+function del(i){
+  let data=JSON.parse(localStorage.lb||"[]")
+  data.splice(i,1)
+  localStorage.lb=JSON.stringify(data)
+  admin()
+  loadBoard()
+}
+
+/* LOAD */
+window.onload=()=>{
+  loadBoard()
+  loadMissions()
+}
+</script>
+
+</body>
+</html>
