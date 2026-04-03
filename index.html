@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scratch Academy</title>
 
-<!-- FIREBASE -->
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -17,8 +17,7 @@ const firebaseConfig = {
   projectId: "scratch-acedemy",
   storageBucket: "scratch-acedemy.firebasestorage.app",
   messagingSenderId: "384466833002",
-  appId: "1:384466833002:web:8a586cbabb9ea4e120c413",
-  measurementId: "G-TKNV52R40P"
+  appId: "1:384466833002:web:8a586cbabb9ea4e120c413"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -31,20 +30,23 @@ window.onValue = onValue;
 window.remove = remove;
 </script>
 
-<!-- CHART -->
+<!-- Chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Segoe UI;
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
 }
 header{
   text-align:center;
   padding:20px;
-  background:#111;
+  background:#000;
+}
+header img{
+  width:80px;
 }
 .container{
   display:flex;
@@ -57,31 +59,44 @@ header{
   padding:20px;
   border-radius:15px;
   width:300px;
-  box-shadow:0 0 15px rgba(0,255,255,0.3);
+  box-shadow:0 0 20px rgba(0,255,255,0.2);
 }
 .profile img{
   width:100%;
   border-radius:15px;
-  margin-bottom:10px;
+}
+h2{
+  color:cyan;
 }
 button{
-  background:linear-gradient(45deg,cyan,blue);
-  border:none;
-  padding:10px;
-  margin:5px;
-  border-radius:10px;
-  cursor:pointer;
-  color:white;
   width:100%;
+  padding:10px;
+  margin:5px 0;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,cyan,blue);
+  color:white;
+  cursor:pointer;
 }
 button:hover{
   transform:scale(1.05);
 }
+input{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:10px;
+}
 #leaderboard li{
   background:#222;
   margin:5px;
-  padding:10px;
-  border-radius:10px;
+  padding:8px;
+  border-radius:8px;
+}
+#adminPanel{
+  display:none;
+  padding:20px;
 }
 .adminUser{
   background:#111;
@@ -92,33 +107,14 @@ button:hover{
   display:flex;
   justify-content:space-between;
 }
-.deleteBtn{
-  background:red;
-}
-#adminPanel{
-  display:none;
-  padding:20px;
-}
-.stats{
-  background:black;
-  padding:10px;
-  margin:10px;
-  border:1px solid cyan;
-}
-input{
-  padding:10px;
-  width:100%;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:none;
-}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>🚀 Scratch Academy</h1>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
+<h1>Scratch Academy</h1>
 </header>
 
 <div class="container">
@@ -126,24 +122,24 @@ input{
 <!-- PROFILE -->
 <div class="card profile">
 <img src="jamil.jpg">
-<h2>👨‍💻 Profile</h2>
-<p><b>Name:</b> Jamil Bakri</p>
-<p><b>Age:</b> 10</p>
-<p><b>Phone:</b> +357 94 020504</p>
-<p><b>Level:</b> Scratch Instructor</p>
+<h2>👨‍💻 Jamil Bakri</h2>
+<p>Age: 10</p>
+<p>Instructor: Scratch</p>
+<p>Phone: +357 94 020504</p>
+<p>Level: Pro Instructor</p>
 </div>
 
 <!-- QUIZ -->
 <div class="card">
 <h2>🧠 Quiz</h2>
-<button onclick="answer(true)">Scratch = Programming</button>
-<button onclick="answer(false)">Scratch = Game</button>
+<button onclick="answer(true)">Scratch is Programming</button>
+<button onclick="answer(false)">Scratch is only a game</button>
 <p id="result"></p>
 </div>
 
 <!-- LEADERBOARD -->
 <div class="card">
-<h2>🌍 Global Leaderboard</h2>
+<h2>🌍 Leaderboard</h2>
 <input id="gmail" placeholder="Enter Gmail">
 <button onclick="saveScore()">Save Score</button>
 <ul id="leaderboard"></ul>
@@ -151,152 +147,107 @@ input{
 
 <!-- TUTORIALS -->
 <div class="card">
-<h2>🎬 Scratch Tutorials</h2>
-
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">
-💡 All Ideas
-</button>
-
-<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">
-🚀 Get Started
-</button>
-
-<button onclick="openLink('https://scratch.mit.edu/starter-projects')">
-📚 Starter Projects
-</button>
-
-<button onclick="openLink('https://scratch.mit.edu/explore/projects/games/')">
-🎮 Explore Games
-</button>
-
+<h2>🎬 Tutorials</h2>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">Ideas</button>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">Get Started</button>
+<button onclick="go('https://scratch.mit.edu/starter-projects')">Tutorials</button>
+<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">Games</button>
 </div>
 
 </div>
 
 <div style="text-align:center;">
-<button onclick="openAdmin()">🛠️ Admin Panel</button>
+<button onclick="adminLogin()">🛠️ Admin Panel</button>
 </div>
 
-<!-- ADMIN -->
 <div id="adminPanel">
-<h2>🛠️ Admin Dashboard</h2>
-
-<div class="stats" id="totalUsers">Users: 0</div>
-<div class="stats" id="avgScore">Average: 0</div>
-
+<h2>Admin Dashboard</h2>
 <canvas id="chart"></canvas>
-
-<h3>🌍 All Users</h3>
 <div id="adminUsers"></div>
 </div>
 
 <script>
-let progress = 0;
+let score = 0;
 let chart;
 
+// quiz
 function answer(correct){
   if(correct){
-    progress += 10;
-    document.getElementById("result").innerText = "Correct ✅";
-  } else {
-    document.getElementById("result").innerText = "Wrong ❌";
+    score += 10;
+    document.getElementById("result").innerText="Correct!";
+  }else{
+    document.getElementById("result").innerText="Wrong!";
   }
 }
 
+// save
 function saveScore(){
   let email = document.getElementById("gmail").value;
-  if(!email.includes("@")){
-    alert("Enter valid Gmail");
-    return;
-  }
-  push(ref(db,"leaderboard"),{
-    name: email,
-    score: progress
-  });
+  if(!email.includes("@")) return alert("Enter Gmail");
+  push(ref(db,"scores"),{name:email,score:score});
 }
 
-function loadLeaderboard(){
-  onValue(ref(db,"leaderboard"),(snapshot)=>{
-    let data = snapshot.val();
+// load
+function load(){
+  onValue(ref(db,"scores"),snap=>{
+    let data = snap.val();
     let list = document.getElementById("leaderboard");
     let admin = document.getElementById("adminUsers");
 
-    list.innerHTML = "";
-    admin.innerHTML = "";
-
+    list.innerHTML="";
+    admin.innerHTML="";
     if(!data) return;
 
-    let arr = [];
-    let total = 0;
-
+    let arr=[];
     for(let id in data){
       arr.push({id,...data[id]});
-      total += data[id].score;
     }
 
     arr.sort((a,b)=>b.score-a.score);
 
-    document.getElementById("totalUsers").innerText = "Users: " + arr.length;
-    document.getElementById("avgScore").innerText = "Average: " + Math.round(total / arr.length);
-
-    updateChart(arr);
+    let labels=[], scores=[];
 
     arr.forEach((u,i)=>{
-      let medal = i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
+      let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
+      list.innerHTML+=`<li>${medal} ${u.name} - ${u.score}</li>`;
 
-      let li = document.createElement("li");
-      li.innerText = `${medal} ${u.name} - ${u.score}%`;
-      list.appendChild(li);
+      labels.push(u.name);
+      scores.push(u.score);
 
-      let div = document.createElement("div");
-      div.className = "adminUser";
-      div.innerHTML = `
-        ${u.name} - ${u.score}%
-        <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
-      `;
-      admin.appendChild(div);
+      admin.innerHTML+=`
+      <div class="adminUser">
+      ${u.name} (${u.score})
+      <button onclick="del('${u.id}')">Delete</button>
+      </div>`;
+    });
+
+    if(chart) chart.destroy();
+    chart=new Chart(document.getElementById("chart"),{
+      type:"bar",
+      data:{labels:labels,datasets:[{data:scores}]}
     });
   });
 }
 
-function updateChart(data){
-  let labels = data.slice(0,5).map(u=>u.name);
-  let scores = data.slice(0,5).map(u=>u.score);
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("chart"),{
-    type:"bar",
-    data:{
-      labels: labels,
-      datasets:[{
-        label:"Top Scores",
-        data: scores
-      }]
-    }
-  });
+// delete
+function del(id){
+  remove(ref(db,"scores/"+id));
 }
 
-function deleteUser(id){
-  if(confirm("Delete user?")){
-    remove(ref(db,"leaderboard/"+id));
+// admin
+function adminLogin(){
+  let p=prompt("Password:");
+  if(p==="jamil"){
+    document.getElementById("adminPanel").style.display="block";
   }
 }
 
-function openAdmin(){
-  let pass = prompt("Password:");
-  if(pass === "jamil"){
-    document.getElementById("adminPanel").style.display = "block";
-  } else {
-    alert("Wrong password!");
-  }
-}
-
-function openLink(url){
+// links
+function go(url){
   window.open(url,"_blank");
 }
 
-window.onload = loadLeaderboard;
+window.onload=load;
 </script>
 
 </body>
