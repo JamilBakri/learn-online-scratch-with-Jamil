@@ -65,9 +65,7 @@ header img{
   width:100%;
   border-radius:15px;
 }
-h2{
-  color:cyan;
-}
+h2{color:cyan;}
 button{
   width:100%;
   padding:10px;
@@ -78,9 +76,7 @@ button{
   color:white;
   cursor:pointer;
 }
-button:hover{
-  transform:scale(1.05);
-}
+button:hover{transform:scale(1.05);}
 input{
   width:100%;
   padding:10px;
@@ -142,16 +138,17 @@ input{
 <h2>🌍 Leaderboard</h2>
 <input id="gmail" placeholder="Enter Gmail">
 <button onclick="saveScore()">Save Score</button>
+<button onclick="generateCertificate()">🎓 Get Certificate</button>
 <ul id="leaderboard"></ul>
 </div>
 
 <!-- TUTORIALS -->
 <div class="card">
 <h2>🎬 Tutorials</h2>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">Ideas</button>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">Get Started</button>
-<button onclick="go('https://scratch.mit.edu/starter-projects')">Tutorials</button>
-<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">Games</button>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
+<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
+<button onclick="go('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
+<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">🎮 Games</button>
 </div>
 
 </div>
@@ -160,6 +157,7 @@ input{
 <button onclick="adminLogin()">🛠️ Admin Panel</button>
 </div>
 
+<!-- ADMIN -->
 <div id="adminPanel">
 <h2>Admin Dashboard</h2>
 <canvas id="chart"></canvas>
@@ -170,7 +168,7 @@ input{
 let score = 0;
 let chart;
 
-// quiz
+// QUIZ
 function answer(correct){
   if(correct){
     score += 10;
@@ -180,14 +178,14 @@ function answer(correct){
   }
 }
 
-// save
+// SAVE SCORE
 function saveScore(){
   let email = document.getElementById("gmail").value;
   if(!email.includes("@")) return alert("Enter Gmail");
   push(ref(db,"scores"),{name:email,score:score});
 }
 
-// load
+// LOAD DATA
 function load(){
   onValue(ref(db,"scores"),snap=>{
     let data = snap.val();
@@ -205,14 +203,14 @@ function load(){
 
     arr.sort((a,b)=>b.score-a.score);
 
-    let labels=[], scores=[];
+    let labels=[], scoresArr=[];
 
     arr.forEach((u,i)=>{
       let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
       list.innerHTML+=`<li>${medal} ${u.name} - ${u.score}</li>`;
 
       labels.push(u.name);
-      scores.push(u.score);
+      scoresArr.push(u.score);
 
       admin.innerHTML+=`
       <div class="adminUser">
@@ -224,17 +222,17 @@ function load(){
     if(chart) chart.destroy();
     chart=new Chart(document.getElementById("chart"),{
       type:"bar",
-      data:{labels:labels,datasets:[{data:scores}]}
+      data:{labels:labels,datasets:[{data:scoresArr}]}
     });
   });
 }
 
-// delete
+// DELETE
 function del(id){
   remove(ref(db,"scores/"+id));
 }
 
-// admin
+// ADMIN
 function adminLogin(){
   let p=prompt("Password:");
   if(p==="jamil"){
@@ -242,9 +240,50 @@ function adminLogin(){
   }
 }
 
-// links
+// LINKS
 function go(url){
   window.open(url,"_blank");
+}
+
+// CERTIFICATE
+function generateCertificate(){
+  let name = document.getElementById("gmail").value;
+  if(!name) return alert("Enter Gmail first!");
+
+  let id = "CERT-" + Math.floor(Math.random()*100000);
+  let date = new Date().toLocaleDateString();
+
+  let w = window.open("", "_blank");
+
+  w.document.write(`
+  <html>
+  <head>
+  <title>Certificate</title>
+  <style>
+  body{
+    text-align:center;
+    font-family:serif;
+    padding:50px;
+    border:10px solid gold;
+  }
+  img{width:120px;}
+  h1{font-size:40px;}
+  </style>
+  </head>
+  <body>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
+  <h1>Certificate of Achievement</h1>
+  <p>This certifies that</p>
+  <h2>${name}</h2>
+  <p>completed Scratch training</p>
+  <p><b>Awarded by:</b> Jamil Bakri</p>
+  <p>Date: ${date}</p>
+  <p>ID: ${id}</p>
+  <br><br>
+  <button onclick="window.print()">Download PDF</button>
+  </body>
+  </html>
+  `);
 }
 
 window.onload=load;
