@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scratch Academy - Jamil Bakri</title>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <style>
 body{
   margin:0;
@@ -61,261 +65,18 @@ button:hover{transform:scale(1.05)}
   border-radius:10px;
 }
 
-#adminPanel{
-  display:none;
-  background:black;
-  padding:20px;
+/* 🔥 LEADERBOARD ANIMATION */
+.leader-item{
+  padding:8px;
+  margin:5px 0;
+  border-radius:10px;
+  background:#222;
+  opacity:0;
+  transform:translateY(20px);
+  animation:fadeIn 0.5s forwards;
 }
-</style>
-</head>
-
-<body>
-
-<header>
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
-<h1>Scratch Academy</h1>
-</header>
-
-<div class="container">
-
-<!-- PROFILE -->
-<div class="card profile">
-<img src="jamil.jpg">
-<h2>👨‍🏫 Jamil Bakri</h2>
-<p>Age: 10</p>
-<p>Instructor of Scratch</p>
-<p>📞 357+94020504</p>
-<p>Level: Master</p>
-</div>
-
-<!-- TUTORIALS -->
-<div class="card">
-<h2>🎬 Tutorials</h2>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
-<button onclick="go('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
-<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">🎮 Games</button>
-</div>
-
-<!-- MISSIONS -->
-<div class="card">
-<h2>📅 Daily Missions</h2>
-<div id="missions"></div>
-</div>
-
-<!-- QUIZ -->
-<div class="card">
-<h2>🧠 Quiz</h2>
-<p id="question">Loading...</p>
-<div id="answers"></div>
-<p id="result"></p>
-
-<div class="bar"><div id="bar" class="bar-inner"></div></div>
-<p id="progress">Progress: 0%</p>
-</div>
-
-<!-- REWARD -->
-<div class="card">
-<h2>🎁 Daily Reward</h2>
-<p id="rewardText">Claim your reward!</p>
-<button onclick="claimReward()">🎁 Claim</button>
-</div>
-
-<!-- BADGES -->
-<div class="card">
-<h2>🏆 Badges</h2>
-<div id="badges"></div>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="card">
-<h2>🌍 Leaderboard</h2>
-<input id="gmail" placeholder="Enter Gmail"><br>
-<button onclick="save()">Save Score</button>
-<button onclick="certificate()">🎓 Certificate</button>
-<div id="board"></div>
-</div>
-
-<!-- ADMIN -->
-<div class="card">
-<h2>🛠 Admin</h2>
-<button onclick="admin()">Open Panel</button>
-</div>
-
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="adminPanel">
-<h2>ADMIN DASHBOARD</h2>
-<div id="adminUsers"></div>
-</div>
-
-<audio id="sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
-
-<script>
-let score=0;
-let currentQuestion=0;
-
-/* LINKS */
-function go(l){window.open(l,"_blank")}
-
-/* QUIZ (10 QUESTIONS, +10 EACH) */
-const questions=[
-{q:"What block moves a sprite?",a:["Motion","Sound","Looks"],c:0},
-{q:"Which block plays music?",a:["Control","Sound","Events"],c:1},
-{q:"What starts a project?",a:["When green flag clicked","Move 10 steps","Say Hello"],c:0},
-{q:"Which block repeats actions?",a:["Repeat","Wait","Say"],c:0},
-{q:"What is a sprite?",a:["Character","Sound","Background"],c:0},
-{q:"Which block changes color?",a:["Looks","Sound","Control"],c:0},
-{q:"Which block waits?",a:["Wait","Repeat","Move"],c:0},
-{q:"Which block detects touching?",a:["Sensing","Motion","Events"],c:0},
-{q:"Which block sends messages?",a:["Broadcast","Move","Sound"],c:0},
-{q:"Which block controls loops?",a:["Control","Looks","Sound"],c:0}
-];
-
-function loadQuestion(){
-  if(currentQuestion>=questions.length){
-    question.innerText="🎉 Quiz Finished!"
-    answers.innerHTML=""
-    return
-  }
-  let q=questions[currentQuestion]
-  question.innerText=q.q
-  answers.innerHTML=""
-  q.a.forEach((ans,i)=>{
-    let b=document.createElement("button")
-    b.innerText=ans
-    b.onclick=()=>{
-      if(i===q.c){
-        score+=10
-        result.innerText="✅ Correct (+10)"
-      }else{
-        result.innerText="❌ Wrong"
-      }
-      currentQuestion++
-      update()
-      loadQuestion()
-    }
-    answers.appendChild(b)
-  })
+@keyframes fadeIn{
+  to{opacity:1;transform:translateY(0);}
 }
-
-/* PROGRESS */
-function update(){
-  if(score>100)score=100
-  bar.style.width=score+"%"
-  progress.innerText="Progress: "+score+"%"
-  updateBadges()
-}
-
-/* BADGES */
-function updateBadges(){
-  badges.innerHTML=""
-  if(score>=20)badges.innerHTML+="🥉 Beginner<br>"
-  if(score>=60)badges.innerHTML+="🥈 Pro<br>"
-  if(score>=100)badges.innerHTML+="🥇 Master<br>"
-}
-
-/* MISSIONS */
-const missionsList=[
-["Move Sprite","https://scratch.mit.edu/projects/editor/?tutorial=getStarted"],
-["Animation","https://scratch.mit.edu/projects/editor/?tutorial=all"],
-["Starter","https://scratch.mit.edu/starter-projects"],
-["Games","https://scratch.mit.edu/explore/projects/games/"]
-];
-
-function loadMissions(){
-  let d=new Date().getDate()
-  missions.innerHTML=""
-  for(let i=0;i<3;i++){
-    let m=missionsList[(d+i)%missionsList.length]
-    let b=document.createElement("button")
-    b.innerText="🎯 "+m[0]
-    b.onclick=()=>{go(m[1]);score+=10;update()}
-    missions.appendChild(b)
-  }
-}
-
-/* REWARD */
-function claimReward(){
-  let t=new Date().toDateString()
-  if(localStorage.reward===t){
-    rewardText.innerText="Already claimed!"
-    return
-  }
-  localStorage.reward=t
-  score+=20
-  update()
-  rewardText.innerText="+20 points!"
-  sound.play()
-}
-
-/* LEADERBOARD */
-function save(){
-  let g=gmail.value
-  if(!g)return alert("Enter Gmail")
-  let data=JSON.parse(localStorage.lb||"[]")
-  data.push({g,score})
-  localStorage.lb=JSON.stringify(data)
-  loadBoard()
-}
-
-function loadBoard(){
-  let data=JSON.parse(localStorage.lb||"[]")
-  data.sort((a,b)=>b.score-a.score)
-  board.innerHTML=""
-  data.forEach((u,i)=>{
-    let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":""
-    board.innerHTML+=medal+" "+u.g+" - "+u.score+"<br>"
-  })
-}
-
-/* CERTIFICATE */
-function certificate(){
-  let g=gmail.value
-  if(!g)return alert("Enter Gmail")
-  let w=window.open()
-  let d=new Date().toLocaleDateString()
-  let id="CERT-"+Math.floor(Math.random()*100000)
-  w.document.write(`
-  <h1 style="text-align:center">Certificate of Achievement</h1>
-  <p style="text-align:center">${g}</p>
-  <p style="text-align:center">Awarded by Jamil Bakri</p>
-  <p style="text-align:center">${d}</p>
-  <p style="text-align:center">${id}</p>
-  <button onclick="window.print()">Download PDF</button>
-  `)
-}
-
-/* ADMIN */
-function admin(){
-  let p=prompt("Password?")
-  if(p==="jamil"){
-    adminPanel.style.display="block"
-    let data=JSON.parse(localStorage.lb||"[]")
-    adminUsers.innerHTML=""
-    data.forEach((u,i)=>{
-      adminUsers.innerHTML+=u.g+" - "+u.score+
-      ` <button onclick="del(${i})">Delete</button><br>`
-    })
-  }
-}
-
-function del(i){
-  let data=JSON.parse(localStorage.lb||"[]")
-  data.splice(i,1)
-  localStorage.lb=JSON.stringify(data)
-  admin()
-  loadBoard()
-}
-
-/* LOAD */
-window.onload=()=>{
-  loadBoard()
-  loadMissions()
-  loadQuestion()
-}
-</script>
-
-</body>
-</html>
+.rank-up{
+  animation:
