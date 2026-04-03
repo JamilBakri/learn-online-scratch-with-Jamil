@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jamil Scratch Tech</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #0f2027, #000000);
+    color: #00fff7;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 20px;
+    background: #000;
+    border-bottom: 2px solid #00fff7;
+}
+
+header h1 {
+    text-shadow: 0 0 10px #00fff7;
+}
+
+/* CARD STYLE */
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 30px;
+}
+
+.card {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #00fff7;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0 0 20px #00fff7;
+}
+
+/* PROFILE */
+.profile {
+    display: flex;
+    align-items: center;
+}
+
+.profile img {
+    width: 180px;
+    border-radius: 15px;
+    margin-right: 20px;
+}
+
+/* BUTTONS */
+.buttons {
+    text-align: center;
+}
+
+button {
+    background: black;
+    border: 1px solid #00fff7;
+    color: #00fff7;
+    padding: 12px 20px;
+    margin: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00fff7;
+    color: black;
+    box-shadow: 0 0 15px #00fff7;
+}
+
+/* CONTACT */
+#contactInfo {
+    display: none;
+    margin-top: 20px;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #00fff7;
+}
+
+/* ADMIN PANEL */
+#login {
+    display: none;
+}
+
+#adminPanel {
+    display: none;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 200px;
+}
+</style>
+
+<script>
+function openLink(link) {
+    window.open(link);
+}
+
+function showContact() {
+    let c = document.getElementById("contactInfo");
+    c.style.display = (c.style.display === "block") ? "none" : "block";
+}
+
+function showAdmin() {
+    document.getElementById("login").style.display = "block";
+}
+
+function checkPassword() {
+    let pass = document.getElementById("pass").value;
+    if(pass === "jamil"){
+        document.getElementById("adminPanel").style.display = "block";
+        alert("Welcome Admin 😎");
+    } else {
+        alert("Wrong Password ❌");
+    }
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+<h1>⚡ Jamil Scratch Tech ⚡</h1>
+<p>Future Coding Starts Here</p>
+</header>
+
+<!-- PROFILE -->
+<div class="container">
+<div class="card profile">
+<img src="https://via.placeholder.com/180">
+<div>
+<h2>👤 Profile</h2>
+<p><b>Name:</b> Jamil Bakri</p>
+<p><b>Age:</b> 10</p>
+<p><b>Instructor of:</b> Scratch</p>
+<p><b>Phone:</b> +357 94 020504</p>
+</div>
+</div>
+</div>
+
+<!-- INFO -->
+<div class="container">
+<div class="card">
+<h2>💡 About Scratch</h2>
+<p>Scratch is a fun programming language where you create games, animations, and stories using blocks.</p>
+
+<h2>🚀 Why Coding?</h2>
+<p>Coding helps you think creatively and build amazing projects for the future.</p>
+</div>
+</div>
+
+<!-- BUTTONS -->
+<div class="buttons">
+
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">
+💡 Ideas
+</button>
+
+<button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">
+🚀 Get Started
+</button>
+
+<button onclick="openLink('https://scratch.mit.edu/starter-projects')">
+📚 Tutorials
+</button>
+
+<br>
+
+<button onclick="showContact()">📞 Contact</button>
+<button onclick="showAdmin()">🔐 Admin Panel</button>
+
+<div id="contactInfo">
+<p><b>Name:</b> Jamil Bakri</p>
+<p><b>Phone:</b> +357 94 020504</p>
+</div>
+
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="login" class="container">
+<div class="card">
+<h2>🔐 Admin Login</h2>
+<input type="password" id="pass" placeholder="Enter password">
+<br><br>
+<button onclick="checkPassword()">Login</button>
+</div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="container">
+<div class="card">
+<h2>🛠️ Admin Dashboard</h2>
+
+<p>✔ Manage Website</p>
+<p>✔ Add Tutorials</p>
+<p>✔ Monitor Users</p>
+
+<button onclick="alert('User banned 🚫')">Ban User</button>
+<button onclick="alert('Content updated ✅')">Update Content</button>
+
+</div>
+</div>
+
+</body>
+</html>
