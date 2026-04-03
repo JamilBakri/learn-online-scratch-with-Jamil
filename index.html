@@ -3,291 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scratch Academy</title>
-
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCFYXIvbofB4NRcCqXtKUgJYAq5jkrAYGI",
-  authDomain: "scratch-acedemy.firebaseapp.com",
-  databaseURL: "https://scratch-acedemy-default-rtdb.firebaseio.com",
-  projectId: "scratch-acedemy",
-  storageBucket: "scratch-acedemy.firebasestorage.app",
-  messagingSenderId: "384466833002",
-  appId: "1:384466833002:web:8a586cbabb9ea4e120c413"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-window.db = db;
-window.ref = ref;
-window.push = push;
-window.onValue = onValue;
-window.remove = remove;
-</script>
-
-<!-- Chart -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Scratch Academy - Jamil Bakri</title>
 
 <style>
 body{
   margin:0;
-  font-family:Segoe UI;
+  font-family:Arial;
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   color:white;
 }
+
 header{
   text-align:center;
   padding:20px;
-  background:#000;
+  background:#ff7b00;
 }
+
 header img{
-  width:80px;
+  width:60px;
 }
+
 .container{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
+  padding:20px;
 }
+
 .card{
   background:#1e1e1e;
-  margin:15px;
+  margin:10px;
   padding:20px;
   border-radius:15px;
   width:300px;
-  box-shadow:0 0 20px rgba(0,255,255,0.2);
+  box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
-.profile img{
-  width:100%;
-  border-radius:15px;
-}
-h2{color:cyan;}
+
 button{
   width:100%;
-  padding:10px;
-  margin:5px 0;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(45deg,cyan,blue);
-  color:white;
-  cursor:pointer;
-}
-button:hover{transform:scale(1.05);}
-input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  margin-bottom:10px;
-}
-#leaderboard li{
-  background:#222;
-  margin:5px;
-  padding:8px;
-  border-radius:8px;
-}
-#adminPanel{
-  display:none;
-  padding:20px;
-}
-.adminUser{
-  background:#111;
-  border:1px solid cyan;
-  margin:10px;
-  padding:10px;
-  border-radius:10px;
-  display:flex;
-  justify-content:space-between;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
-<h1>Scratch Academy</h1>
-</header>
-
-<div class="container">
-
-<!-- PROFILE -->
-<div class="card profile">
-<img src="jamil.jpg">
-<h2>👨‍💻 Jamil Bakri</h2>
-<p>Age: 10</p>
-<p>Instructor: Scratch</p>
-<p>Phone: +357 94 020504</p>
-<p>Level: Pro Instructor</p>
-</div>
-
-<!-- QUIZ -->
-<div class="card">
-<h2>🧠 Quiz</h2>
-<button onclick="answer(true)">Scratch is Programming</button>
-<button onclick="answer(false)">Scratch is only a game</button>
-<p id="result"></p>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="card">
-<h2>🌍 Leaderboard</h2>
-<input id="gmail" placeholder="Enter Gmail">
-<button onclick="saveScore()">Save Score</button>
-<button onclick="generateCertificate()">🎓 Get Certificate</button>
-<ul id="leaderboard"></ul>
-</div>
-
-<!-- TUTORIALS -->
-<div class="card">
-<h2>🎬 Tutorials</h2>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
-<button onclick="go('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
-<button onclick="go('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
-<button onclick="go('https://scratch.mit.edu/explore/projects/games/')">🎮 Games</button>
-</div>
-
-</div>
-
-<div style="text-align:center;">
-<button onclick="adminLogin()">🛠️ Admin Panel</button>
-</div>
-
-<!-- ADMIN -->
-<div id="adminPanel">
-<h2>Admin Dashboard</h2>
-<canvas id="chart"></canvas>
-<div id="adminUsers"></div>
-</div>
-
-<script>
-let score = 0;
-let chart;
-
-// QUIZ
-function answer(correct){
-  if(correct){
-    score += 10;
-    document.getElementById("result").innerText="Correct!";
-  }else{
-    document.getElementById("result").innerText="Wrong!";
-  }
-}
-
-// SAVE SCORE
-function saveScore(){
-  let email = document.getElementById("gmail").value;
-  if(!email.includes("@")) return alert("Enter Gmail");
-  push(ref(db,"scores"),{name:email,score:score});
-}
-
-// LOAD DATA
-function load(){
-  onValue(ref(db,"scores"),snap=>{
-    let data = snap.val();
-    let list = document.getElementById("leaderboard");
-    let admin = document.getElementById("adminUsers");
-
-    list.innerHTML="";
-    admin.innerHTML="";
-    if(!data) return;
-
-    let arr=[];
-    for(let id in data){
-      arr.push({id,...data[id]});
-    }
-
-    arr.sort((a,b)=>b.score-a.score);
-
-    let labels=[], scoresArr=[];
-
-    arr.forEach((u,i)=>{
-      let medal=i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
-      list.innerHTML+=`<li>${medal} ${u.name} - ${u.score}</li>`;
-
-      labels.push(u.name);
-      scoresArr.push(u.score);
-
-      admin.innerHTML+=`
-      <div class="adminUser">
-      ${u.name} (${u.score})
-      <button onclick="del('${u.id}')">Delete</button>
-      </div>`;
-    });
-
-    if(chart) chart.destroy();
-    chart=new Chart(document.getElementById("chart"),{
-      type:"bar",
-      data:{labels:labels,datasets:[{data:scoresArr}]}
-    });
-  });
-}
-
-// DELETE
-function del(id){
-  remove(ref(db,"scores/"+id));
-}
-
-// ADMIN
-function adminLogin(){
-  let p=prompt("Password:");
-  if(p==="jamil"){
-    document.getElementById("adminPanel").style.display="block";
-  }
-}
-
-// LINKS
-function go(url){
-  window.open(url,"_blank");
-}
-
-// CERTIFICATE
-function generateCertificate(){
-  let name = document.getElementById("gmail").value;
-  if(!name) return alert("Enter Gmail first!");
-
-  let id = "CERT-" + Math.floor(Math.random()*100000);
-  let date = new Date().toLocaleDateString();
-
-  let w = window.open("", "_blank");
-
-  w.document.write(`
-  <html>
-  <head>
-  <title>Certificate</title>
-  <style>
-  body{
-    text-align:center;
-    font-family:serif;
-    padding:50px;
-    border:10px solid gold;
-  }
-  img{width:120px;}
-  h1{font-size:40px;}
-  </style>
-  </head>
-  <body>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
-  <h1>Certificate of Achievement</h1>
-  <p>This certifies that</p>
-  <h2>${name}</h2>
-  <p>completed Scratch training</p>
-  <p><b>Awarded by:</b> Jamil Bakri</p>
-  <p>Date: ${date}</p>
-  <p>ID: ${id}</p>
-  <br><br>
-  <button onclick="window.print()">Download PDF</button>
-  </body>
-  </html>
-  `);
-}
-
-window.onload=load;
-</script>
-
-</body>
-</html>
+  padding
