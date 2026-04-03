@@ -11,13 +11,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "PASTE_KEY",
-  authDomain: "PASTE_DOMAIN",
-  databaseURL: "PASTE_DB_URL",
-  projectId: "PASTE",
-  storageBucket: "PASTE",
-  messagingSenderId: "PASTE",
-  appId: "PASTE"
+  apiKey: "AIzaSyCFYXIvbofB4NRcCqXtKUgJYAq5jkrAYGI",
+  authDomain: "scratch-acedemy.firebaseapp.com",
+  databaseURL: "https://scratch-acedemy-default-rtdb.firebaseio.com",
+  projectId: "scratch-acedemy",
+  storageBucket: "scratch-acedemy.firebasestorage.app",
+  messagingSenderId: "384466833002",
+  appId: "1:384466833002:web:8a586cbabb9ea4e120c413",
+  measurementId: "G-TKNV52R40P"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -30,69 +31,69 @@ window.onValue = onValue;
 window.remove = remove;
 </script>
 
-<!-- CHART.JS -->
+<!-- CHART -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:white;
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
 }
 header{
-    text-align:center;
-    padding:20px;
-    background:#111;
-    box-shadow:0 0 20px cyan;
+  text-align:center;
+  padding:20px;
+  background:#111;
 }
 .container{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 .card{
-    background:#1e1e1e;
-    margin:15px;
-    padding:20px;
-    border-radius:15px;
-    width:300px;
-    box-shadow:0 0 15px rgba(0,255,255,0.3);
+  background:#1e1e1e;
+  margin:15px;
+  padding:20px;
+  border-radius:15px;
+  width:300px;
 }
 button{
-    background:linear-gradient(45deg,cyan,blue);
-    border:none;
-    padding:10px;
-    margin:5px;
-    border-radius:10px;
-    cursor:pointer;
-    color:white;
+  background:linear-gradient(45deg,cyan,blue);
+  border:none;
+  padding:10px;
+  margin:5px;
+  border-radius:10px;
+  cursor:pointer;
+  color:white;
+}
+#leaderboard li{
+  background:#222;
+  margin:5px;
+  padding:10px;
+  border-radius:10px;
 }
 .adminUser{
-    background:#111;
-    border:1px solid cyan;
-    padding:10px;
-    margin:10px;
-    border-radius:12px;
-    display:flex;
-    justify-content:space-between;
+  background:#111;
+  border:1px solid cyan;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
 }
 .deleteBtn{
-    background:red;
-    border:none;
-    padding:5px;
-    border-radius:6px;
-    cursor:pointer;
+  background:red;
 }
 #adminPanel{
-    display:none;
-    padding:20px;
+  display:none;
+  padding:20px;
 }
 .stats{
-    margin:10px;
-    padding:10px;
-    background:#000;
-    border:1px solid cyan;
+  background:black;
+  padding:10px;
+  margin:10px;
+  border:1px solid cyan;
 }
 </style>
 </head>
@@ -125,16 +126,15 @@ button{
 <button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="adminPanel">
 <h2>🛠️ Admin Dashboard</h2>
 
 <div class="stats" id="totalUsers">Users: 0</div>
-<div class="stats" id="avgScore">Average Score: 0</div>
+<div class="stats" id="avgScore">Average: 0</div>
 
 <canvas id="chart"></canvas>
 
-<h3>🌍 All Users</h3>
+<h3>All Users</h3>
 <div id="adminUsers"></div>
 </div>
 
@@ -144,109 +144,106 @@ let chart;
 
 // QUIZ
 function answer(correct){
-    if(correct){
-        progress+=10;
-        document.getElementById("result").innerText="Correct ✅";
-    }else{
-        document.getElementById("result").innerText="Wrong ❌";
-    }
+  if(correct){
+    progress+=10;
+    document.getElementById("result").innerText="Correct ✅";
+  }else{
+    document.getElementById("result").innerText="Wrong ❌";
+  }
 }
 
 // SAVE
 function saveScore(){
-    let email=document.getElementById("gmail").value;
+  let email=document.getElementById("gmail").value;
 
-    if(!email.includes("@")){
-        alert("Enter valid Gmail");
-        return;
-    }
+  if(!email.includes("@")){
+    alert("Enter valid Gmail");
+    return;
+  }
 
-    push(ref(db,"leaderboard"),{
-        name:email,
-        score:progress
-    });
+  push(ref(db,"leaderboard"),{
+    name:email,
+    score:progress
+  });
 }
 
-// LOAD DATA
+// LOAD
 function loadLeaderboard(){
-    onValue(ref(db,"leaderboard"),(snapshot)=>{
-        let data=snapshot.val();
-        let list=document.getElementById("leaderboard");
-        let container=document.getElementById("adminUsers");
+  onValue(ref(db,"leaderboard"),(snapshot)=>{
+    let data=snapshot.val();
 
-        list.innerHTML="";
-        container.innerHTML="";
+    let list=document.getElementById("leaderboard");
+    let admin=document.getElementById("adminUsers");
 
-        let arr=[];
-        let total=0;
+    list.innerHTML="";
+    admin.innerHTML="";
 
-        for(let id in data){
-            arr.push({id,...data[id]});
-            total+=data[id].score;
-        }
+    if(!data) return;
 
-        arr.sort((a,b)=>b.score-a.score);
+    let arr=[];
+    let total=0;
 
-        // leaderboard
-        arr.forEach((u,i)=>{
-            let li=document.createElement("li");
-            li.innerHTML=`${u.name} - ${u.score}%`;
-            list.appendChild(li);
-        });
+    for(let id in data){
+      arr.push({id,...data[id]});
+      total+=data[id].score;
+    }
 
-        // stats
-        document.getElementById("totalUsers").innerText="Users: "+arr.length;
-        document.getElementById("avgScore").innerText="Average Score: "+Math.round(total/arr.length || 0);
+    arr.sort((a,b)=>b.score-a.score);
 
-        // chart
-        updateChart(arr);
+    document.getElementById("totalUsers").innerText="Users: "+arr.length;
+    document.getElementById("avgScore").innerText="Average: "+Math.round(total/arr.length);
 
-        // admin users
-        arr.forEach(u=>{
-            let div=document.createElement("div");
-            div.className="adminUser";
-            div.innerHTML=`
-            ${u.name} - ${u.score}%
-            <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
-            `;
-            container.appendChild(div);
-        });
+    updateChart(arr);
+
+    arr.forEach(u=>{
+      let li=document.createElement("li");
+      li.innerText=`${u.name} - ${u.score}%`;
+      list.appendChild(li);
+
+      let div=document.createElement("div");
+      div.className="adminUser";
+      div.innerHTML=`
+      ${u.name} - ${u.score}%
+      <button class="deleteBtn" onclick="deleteUser('${u.id}')">Delete</button>
+      `;
+      admin.appendChild(div);
     });
+  });
 }
 
 // CHART
 function updateChart(data){
-    let labels=data.slice(0,5).map(u=>u.name);
-    let scores=data.slice(0,5).map(u=>u.score);
+  let labels=data.slice(0,5).map(u=>u.name);
+  let scores=data.slice(0,5).map(u=>u.score);
 
-    if(chart) chart.destroy();
+  if(chart) chart.destroy();
 
-    chart=new Chart(document.getElementById("chart"),{
-        type:"bar",
-        data:{
-            labels:labels,
-            datasets:[{
-                label:"Top Scores",
-                data:scores
-            }]
-        }
-    });
+  chart=new Chart(document.getElementById("chart"),{
+    type:"bar",
+    data:{
+      labels:labels,
+      datasets:[{
+        label:"Top Scores",
+        data:scores
+      }]
+    }
+  });
 }
 
 // DELETE
 function deleteUser(id){
-    if(confirm("Delete?")){
-        remove(ref(db,"leaderboard/"+id));
-    }
+  if(confirm("Delete user?")){
+    remove(ref(db,"leaderboard/"+id));
+  }
 }
 
 // ADMIN
 function openAdmin(){
-    let pass=prompt("Password:");
-    if(pass==="jamil"){
-        document.getElementById("adminPanel").style.display="block";
-        loadLeaderboard();
-    }
+  let pass=prompt("Password:");
+  if(pass==="jamil"){
+    document.getElementById("adminPanel").style.display="block";
+    loadLeaderboard();
+  }
 }
 
 // INIT
