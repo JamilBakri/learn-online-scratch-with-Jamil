@@ -3,240 +3,309 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jamil Scratch Tech</title>
+<title>Scratch Academy</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #0f2027, #000000);
-    color: #00fff7;
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
 }
 
 /* HEADER */
-header {
-    text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.9);
-    border-bottom: 2px solid #00fff7;
+header{
+    text-align:center;
+    padding:20px;
+    background:#111;
+    box-shadow:0 0 20px cyan;
 }
 
-header h1 {
-    text-shadow: 0 0 15px #00fff7;
-    font-size: 28px;
+header img{
+    width:80px;
 }
 
-header img {
-    width: 60px;
-    margin-bottom: 10px;
-    filter: drop-shadow(0 0 10px #00fff7);
+/* CARDS */
+.container{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
 }
 
-/* GLASS CARD */
-.container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 30px;
-}
-
-.card {
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,255,247,0.3);
-    border-radius: 20px;
-    padding: 25px;
-    margin: 15px;
-    box-shadow: 0 0 25px rgba(0,255,247,0.4);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
+.card{
+    background:#1e1e1e;
+    margin:15px;
+    padding:20px;
+    border-radius:15px;
+    width:300px;
+    box-shadow:0 0 15px rgba(0,255,255,0.3);
 }
 
 /* PROFILE */
-.profile {
-    display: flex;
-    align-items: center;
-}
-
-.profile img {
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 15px;
-    margin-right: 20px;
-    box-shadow: 0 0 20px #00fff7;
+.profile img{
+    width:100%;
+    border-radius:15px;
 }
 
 /* BUTTONS */
-.buttons {
-    text-align: center;
+button{
+    background:linear-gradient(45deg,cyan,blue);
+    border:none;
+    padding:10px;
+    margin:5px;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
 }
 
-button {
-    background: rgba(0,0,0,0.7);
-    border: 1px solid #00fff7;
-    color: #00fff7;
-    padding: 12px 22px;
-    margin: 10px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 16px;
+button:hover{
+    transform:scale(1.1);
 }
 
-button:hover {
-    background: #00fff7;
-    color: black;
-    box-shadow: 0 0 15px #00fff7;
-}
-
-/* CONTACT */
-#contactInfo {
-    display: none;
-    margin-top: 20px;
-    background: #111;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #00fff7;
+/* LEADERBOARD */
+#leaderboard li{
+    margin:10px;
+    padding:10px;
+    background:#222;
+    border-radius:10px;
+    list-style:none;
 }
 
 /* ADMIN */
-#login {
-    display: none;
-}
-
-#adminPanel {
-    display: none;
-    justify-content: center;
-}
-
-input {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    width: 200px;
-    text-align: center;
+#adminPanel{
+    display:none;
+    background:#000;
+    padding:20px;
+    margin:20px;
+    border:2px solid red;
 }
 </style>
-
-<script>
-function openLink(link) {
-    window.open(link, '_blank');
-}
-
-function showContact() {
-    let c = document.getElementById("contactInfo");
-    c.style.display = (c.style.display === "block") ? "none" : "block";
-}
-
-function showAdmin() {
-    document.getElementById("login").style.display = "block";
-    document.getElementById("adminPanel").style.display = "none";
-}
-
-function checkPassword() {
-    let pass = document.getElementById("pass").value.trim();
-
-    if(pass === "jamil"){
-        document.getElementById("login").style.display = "none";
-        document.getElementById("adminPanel").style.display = "flex";
-        alert("Welcome Admin 😎");
-    } else {
-        alert("Wrong Password ❌");
-    }
-}
-
-function logout() {
-    document.getElementById("adminPanel").style.display = "none";
-    document.getElementById("login").style.display = "block";
-    document.getElementById("pass").value = "";
-}
-</script>
-
 </head>
 
 <body>
 
 <header>
 <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Scratch.logo.S.png">
-<h1>⚡ Jamil Scratch Tech ⚡</h1>
-<p>Future Coding Starts Here</p>
+<h1>🚀 Scratch Academy</h1>
 </header>
 
+<div class="container">
+
 <!-- PROFILE -->
-<div class="container">
 <div class="card profile">
-<img src="jamil.jpg" alt="Jamil">
-<div>
-<h2>👤 Profile</h2>
-<p><b>Name:</b> Jamil Bakri</p>
-<p><b>Age:</b> 10</p>
-<p><b>Instructor of:</b> Scratch</p>
-<p><b>Phone:</b> +357 94 020504</p>
-</div>
-</div>
+<img src="jamil.jpg">
+<h2>👤 Jamil Bakri</h2>
+<p>Age: 10</p>
+<p>Instructor of Scratch</p>
+<p>📞 +357 94020504</p>
 </div>
 
-<!-- INFO -->
-<div class="container">
+<!-- TUTORIALS -->
 <div class="card">
-<h2>💡 About Scratch</h2>
-<p>Scratch is a fun programming language where you create games, animations, and stories using blocks.</p>
-
-<h2>🚀 Why Coding?</h2>
-<p>Coding helps you think creatively and build amazing projects for the future.</p>
-</div>
-</div>
-
-<!-- BUTTONS -->
-<div class="buttons">
-
+<h2>🎬 Tutorials</h2>
 <button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=all')">💡 Ideas</button>
-
 <button onclick="openLink('https://scratch.mit.edu/projects/editor/?tutorial=getStarted')">🚀 Get Started</button>
-
 <button onclick="openLink('https://scratch.mit.edu/starter-projects')">📚 Tutorials</button>
-
-<br>
-
-<button onclick="showContact()">📞 Contact</button>
-<button onclick="showAdmin()">🔐 Admin Panel</button>
-
-<div id="contactInfo">
-<p><b>Name:</b> Jamil Bakri</p>
-<p><b>Phone:</b> +357 94 020504</p>
 </div>
 
-</div>
-
-<!-- LOGIN -->
-<div id="login" class="container">
+<!-- PROGRESS -->
 <div class="card">
-<h2>🔐 Admin Login</h2>
-<input type="password" id="pass" placeholder="Enter password">
-<br><br>
-<button onclick="checkPassword()">Login</button>
-</div>
+<h2>📊 Progress</h2>
+<progress id="progressBar" value="0" max="100"></progress>
+<p id="progressText">0%</p>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="container">
+<!-- BADGE -->
 <div class="card">
-<h2>🛠️ Admin Dashboard</h2>
+<h2>🏆 Badge</h2>
+<p id="badge">Beginner 🟢</p>
+</div>
 
-<p>✔ Manage Website</p>
-<p>✔ Add Tutorials</p>
-<p>✔ Monitor Users</p>
+<!-- QUIZ -->
+<div class="card">
+<h2>🧠 Quiz</h2>
+<p>What is Scratch?</p>
+<button onclick="answer(true)">Programming Language</button>
+<button onclick="answer(false)">Game</button>
+<p id="result"></p>
+</div>
 
-<button onclick="alert('User banned 🚫')">Ban User</button>
-<button onclick="alert('Content updated ✅')">Update Content</button>
-<button onclick="logout()">Logout</button>
+<!-- LEADERBOARD -->
+<div class="card">
+<h2>🌍 Leaderboard</h2>
+<input id="username" placeholder="Your name">
+<input type="file" id="avatarInput">
+<button onclick="saveScore()">Save Score</button>
+<ul id="leaderboard"></ul>
+</div>
+
+<!-- CERTIFICATE -->
+<div class="card">
+<h2>🎓 Certificate</h2>
+<button onclick="generateCertificate()">Get Certificate</button>
+</div>
 
 </div>
+
+<!-- ADMIN -->
+<div style="text-align:center;">
+<button onclick="openAdmin()">🛠️ Admin Panel</button>
 </div>
+
+<div id="adminPanel">
+<h2>Admin Panel</h2>
+<button onclick="resetProgress()">Reset Progress</button>
+<button onclick="clearLeaderboard()">Clear Leaderboard</button>
+</div>
+
+<audio id="sound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+
+<script>
+let progress=0;
+
+// LINKS
+function openLink(url){
+    window.open(url,"_blank");
+}
+
+// QUIZ
+function answer(correct){
+    let res=document.getElementById("result");
+
+    if(correct){
+        res.innerText="Correct ✅";
+        addProgress(10);
+    }else{
+        res.innerText="Wrong ❌";
+    }
+}
+
+// PROGRESS
+function addProgress(val){
+    progress+=val;
+    if(progress>100)progress=100;
+
+    document.getElementById("progressBar").value=progress;
+    document.getElementById("progressText").innerText=progress+"%";
+
+    updateBadge();
+
+    localStorage.setItem("progress",progress);
+}
+
+// BADGE
+function updateBadge(){
+    let b=document.getElementById("badge");
+
+    if(progress>=100)b.innerText="Master 🔥";
+    else if(progress>=60)b.innerText="Pro ⚡";
+    else if(progress>=30)b.innerText="Intermediate 💡";
+    else b.innerText="Beginner 🟢";
+}
+
+// LOAD
+window.onload=function(){
+    let saved=localStorage.getItem("progress");
+    if(saved){
+        progress=parseInt(saved);
+        document.getElementById("progressBar").value=progress;
+        document.getElementById("progressText").innerText=progress+"%";
+        updateBadge();
+    }
+    loadLeaderboard();
+};
+
+// LEADERBOARD
+let lastTop="";
+
+function saveScore(){
+    let name=document.getElementById("username").value||"Player";
+    let file=document.getElementById("avatarInput").files[0];
+
+    let reader=new FileReader();
+
+    reader.onload=function(){
+        let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
+
+        data.push({
+            name:name,
+            score:progress,
+            avatar:reader.result||"https://via.placeholder.com/40"
+        });
+
+        localStorage.setItem("leaderboard",JSON.stringify(data));
+        loadLeaderboard();
+    };
+
+    if(file)reader.readAsDataURL(file);
+    else reader.onload();
+}
+
+function loadLeaderboard(){
+    let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
+
+    data.sort((a,b)=>b.score-a.score);
+
+    let list=document.getElementById("leaderboard");
+    list.innerHTML="";
+
+    data.forEach((u,i)=>{
+        let medal="";
+        if(i==0)medal="🥇";
+        else if(i==1)medal="🥈";
+        else if(i==2)medal="🥉";
+
+        let li=document.createElement("li");
+
+        li.innerHTML=`${medal}
+        <img src="${u.avatar}" width="40" style="border-radius:50%;">
+        ${u.name} - ${u.score}%`;
+
+        list.appendChild(li);
+    });
+
+    if(data[0] && data[0].name!==lastTop){
+        document.getElementById("sound").play();
+        lastTop=data[0].name;
+    }
+}
+
+setInterval(loadLeaderboard,3000);
+
+// CERTIFICATE
+function generateCertificate(){
+    let name=document.getElementById("username").value||"Student";
+
+    let win=window.open("","");
+    win.document.write(`
+    <h1>🏆 Certificate</h1>
+    <h2>${name}</h2>
+    <p>Completed Scratch Course</p>
+    <p>Score: ${progress}%</p>
+    <p>Instructor: Jamil Bakri</p>
+    `);
+}
+
+// ADMIN
+function openAdmin(){
+    let pass=prompt("Enter admin password:");
+    if(pass==="jamil"){
+        document.getElementById("adminPanel").style.display="block";
+    }else{
+        alert("Wrong password");
+    }
+}
+
+function resetProgress(){
+    localStorage.removeItem("progress");
+    location.reload();
+}
+
+function clearLeaderboard(){
+    localStorage.removeItem("leaderboard");
+    loadLeaderboard();
+}
+</script>
 
 </body>
 </html>
